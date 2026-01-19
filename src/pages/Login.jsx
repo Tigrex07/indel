@@ -16,15 +16,15 @@ export default function Login() {
 
     try {
       const response = await fetch(
-        "http://localhost/indel-backend/login.php",
+        "https://corporacionperris.com/backend/login.php",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            usuario: username,
-            contrasena: password,
+            numEmpleado: username,
+            clave: password,
           }),
         }
       );
