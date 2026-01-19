@@ -3,7 +3,7 @@ import utnLogo from "../assets/utn.png";
 import tiLogo from "../assets/ti.png";
 import fondoUtn from "../assets/fondo-utn.jpg";
 
-export default function Login() {
+export default function Login({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [mensaje, setMensaje] = useState("");
@@ -15,24 +15,21 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "https://corporacionperris.com/backend/login.php",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            numEmpleado: username,
-            clave: password,
-          }),
-        }
-      );
+      const response = await fetch("https://corporacionperris.com/backend/login.php", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  body: JSON.stringify({
+    numEmpleado: username,
+    clave: password,
+  }),
+});
 
       const data = await response.json();
 
       if (data.success) {
         setMensaje("✅ " + data.message);
+        onLogin();
       } else {
         setMensaje("❌ " + data.message);
       }
@@ -53,7 +50,6 @@ export default function Login() {
 
       {/* Contenedor */}
       <div className="relative w-full max-w-lg bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-10 border border-green-300">
-
         {/* Logos */}
         <div className="flex justify-center items-center gap-8 mb-8">
           <img src={utnLogo} alt="UTN Logo" className="h-20 drop-shadow-lg" />
@@ -99,9 +95,7 @@ export default function Login() {
         </form>
 
         {mensaje && (
-          <p className="mt-6 text-center font-semibold">
-            {mensaje}
-          </p>
+          <p className="mt-6 text-center font-semibold">{mensaje}</p>
         )}
 
         <p className="mt-4 text-center text-sm text-green-700 hover:underline cursor-pointer">
