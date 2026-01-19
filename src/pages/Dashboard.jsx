@@ -1,17 +1,31 @@
 import { useState } from "react";
+import {
+  LayoutDashboard,
+  Package,
+  Trash2,
+  Repeat,
+  User,
+  Users,
+  FileText,
+  Settings,
+  LogOut
+} from "lucide-react";
+
+import DashboardHome from "../components/DashboardHome.jsx";
 
 const sections = [
-  { key: "activos", label: "Activos", icon: "📦" },
-  { key: "bajas", label: "Bajas", icon: "🗑️" },
-  { key: "transferencias", label: "Transferencias", icon: "⇄" },
-  { key: "encargados", label: "Encargados", icon: "👤" },
-  { key: "usuarios", label: "Usuarios", icon: "👥" },
-  { key: "reportes", label: "Reportes", icon: "📑" },
-  { key: "preferencias", label: "Preferencias", icon: "⚙" },
+  { key: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
+  { key: "activos", label: "Activos", icon: <Package size={20} /> },
+  { key: "bajas", label: "Bajas", icon: <Trash2 size={20} /> },
+  { key: "transferencias", label: "Transferencias", icon: <Repeat size={20} /> },
+  { key: "encargados", label: "Encargados", icon: <User size={20} /> },
+  { key: "usuarios", label: "Usuarios", icon: <Users size={20} /> },
+  { key: "reportes", label: "Reportes", icon: <FileText size={20} /> },
+  { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> },
 ];
 
 export default function Dashboard({ username, onLogout, onOpenCategory }) {
-  const [activeSection, setActiveSection] = useState("activos");
+  const [activeSection, setActiveSection] = useState("dashboard");
 
   return (
     <div className="min-h-screen flex bg-emerald-50 text-gray-900">
@@ -34,51 +48,43 @@ export default function Dashboard({ username, onLogout, onOpenCategory }) {
                   ? "bg-emerald-400 text-black shadow-lg scale-105" 
                   : "hover:bg-emerald-300 hover:text-black"}`}
             >
-              <span>{s.icon}</span>
+              {s.icon}
               <span className="font-semibold">{s.label}</span>
             </button>
           ))}
         </nav>
 
-        {/* Bienvenida abajo a la izquierda */}
+        {/* Bienvenida */}
         <div className="mt-auto pt-6 text-sm text-emerald-200 opacity-80">
           Bienvenido, <span className="font-semibold text-white">{username}</span>
         </div>
+
+        {/* Botón de cerrar sesión */}
+        <button
+          onClick={onLogout}
+          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition"
+        >
+          <LogOut size={18} />
+          Cerrar sesión
+        </button>
 
       </aside>
 
       {/* MAIN */}
       <main className="flex-1 p-10 space-y-10">
 
-        {/* Header */}
+        {/* Header sin filtros */}
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-extrabold text-emerald-700 tracking-wide">
             Panel de Control
           </h1>
-
-          <div className="flex gap-4 items-center">
-            <input
-              type="text"
-              placeholder="Buscar por edificio"
-              className="px-4 py-2 border rounded-full w-56 focus:ring-2 focus:ring-emerald-500"
-            />
-            <input
-              type="text"
-              placeholder="Buscar por aula"
-              className="px-4 py-2 border rounded-full w-56 focus:ring-2 focus:ring-emerald-500"
-            />
-
-            <button
-              onClick={onLogout}
-              className="px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition"
-            >
-              Cerrar sesión
-            </button>
-          </div>
         </div>
 
         {/* Sección dinámica */}
-        <SectionRenderer section={activeSection} onOpenCategory={onOpenCategory} />
+        <SectionRenderer 
+          section={activeSection} 
+          onOpenCategory={onOpenCategory} 
+        />
 
       </main>
     </div>
@@ -87,6 +93,10 @@ export default function Dashboard({ username, onLogout, onOpenCategory }) {
 
 function SectionRenderer({ section, onOpenCategory }) {
   switch (section) {
+
+    case "dashboard":
+      return <DashboardHome />;
+
     case "activos":
       return <ActivosSection onOpenCategory={onOpenCategory} />;
 

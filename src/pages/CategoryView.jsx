@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Search, Filter } from "lucide-react";
 
 export default function CategoryView({ category, onBack }) {
   // Datos con columna DOCENCIA
@@ -56,22 +57,28 @@ export default function CategoryView({ category, onBack }) {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <KPI icon="📦" title="Total" value={registros.length} />
-        <KPI icon="✔️" title="En buen estado" value={registros.filter(r => ["Bueno", "Operativo"].includes(r.estado)).length} />
-        <KPI icon="🛠️" title="En revisión" value={registros.filter(r => ["Revisión", "Mantenimiento"].includes(r.estado)).length} />
-        <KPI icon="⚠️" title="Críticos" value={registros.filter(r => r.estado === "Regular").length} />
+        <KPI icon={<Search size={26} />} title="Total" value={registros.length} />
+        <KPI icon={<Filter size={26} />} title="En buen estado" value={registros.filter(r => ["Bueno", "Operativo"].includes(r.estado)).length} />
+        <KPI icon={<Filter size={26} />} title="En revisión" value={registros.filter(r => ["Revisión", "Mantenimiento"].includes(r.estado)).length} />
+        <KPI icon={<Filter size={26} />} title="Críticos" value={registros.filter(r => r.estado === "Regular").length} />
       </div>
 
       {/* Filtros */}
       <div className="bg-white p-6 rounded-xl shadow-md border border-emerald-200 flex flex-col md:flex-row gap-4">
-        <input
-          type="text"
-          placeholder="Buscar por ID, Aula o Docencia..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
-        />
+        
+        {/* Buscar */}
+        <div className="flex-1 relative">
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600" />
+          <input
+            type="text"
+            placeholder="Buscar por ID, Aula o Docencia..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
+          />
+        </div>
 
+        {/* Estado */}
         <select
           value={estadoFilter}
           onChange={(e) => setEstadoFilter(e.target.value)}
@@ -85,6 +92,7 @@ export default function CategoryView({ category, onBack }) {
           <option value="Revisión">Revisión</option>
           <option value="Mantenimiento">Mantenimiento</option>
         </select>
+
       </div>
 
       {/* Tabla */}
@@ -127,7 +135,7 @@ export default function CategoryView({ category, onBack }) {
 function KPI({ icon, title, value }) {
   return (
     <div className="p-6 rounded-xl shadow-lg bg-white border border-gray-200 flex items-center gap-4">
-      <div className="text-3xl">{icon}</div>
+      <div className="text-emerald-600">{icon}</div>
       <div>
         <p className="text-sm text-gray-500">{title}</p>
         <p className="text-2xl font-bold text-gray-800">{value}</p>
