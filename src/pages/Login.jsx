@@ -16,20 +16,21 @@ export default function Login({ onLogin }) {
 
     try {
       const response = await fetch("https://corporacionperris.com/backend/login.php", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  credentials: "include",
-  body: JSON.stringify({
-    numEmpleado: username,
-    clave: password,
-  }),
-});
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          numEmpleado: username,
+          clave: password,
+        }),
+      });
 
       const data = await response.json();
 
       if (data.success) {
         setMensaje("✅ " + data.message);
-        onLogin();
+        // Pasamos el nombre real al App.jsx
+        onLogin(data.nombre); // ← asegúrate que el backend devuelve { success: true, nombre: "Viktor" }
       } else {
         setMensaje("❌ " + data.message);
       }
