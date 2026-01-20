@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Plus, X } from "lucide-react";
 
 export default function CategoryView({ category, onBack }) {
-  // Datos con columna DOCENCIA
   const data = {
     Escritorios: [
       { id: "0001", aula: "18", docencia: "Edificio A", fecha: "19/01/26", estado: "Bueno" },
@@ -23,9 +22,9 @@ export default function CategoryView({ category, onBack }) {
 
   const registros = data[category] || [];
 
-  // Filtros
   const [search, setSearch] = useState("");
   const [estadoFilter, setEstadoFilter] = useState("");
+  const [openForm, setOpenForm] = useState(false);
 
   const filtrados = registros.filter((item) => {
     const matchSearch =
@@ -39,7 +38,7 @@ export default function CategoryView({ category, onBack }) {
   });
 
   return (
-    <div className="min-h-screen bg-emerald-50 p-10 space-y-10">
+    <div className="min-h-screen bg-emerald-50 p-10 space-y-10 relative">
 
       {/* Header */}
       <div className="flex justify-between items-center">
@@ -47,26 +46,34 @@ export default function CategoryView({ category, onBack }) {
           {category} — Vista General
         </h1>
 
-        <button
-          onClick={onBack}
-          className="px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition"
-        >
-          Volver al Dashboard
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setOpenForm(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition"
+          >
+            <Plus size={18} /> Agregar {category.slice(0, -1)}
+          </button>
+
+          <button
+            onClick={onBack}
+            className="px-4 py-2 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400 transition"
+          >
+            Volver
+          </button>
+        </div>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <KPI icon={<Search size={26} />} title="Total" value={registros.length} />
-        <KPI icon={<Filter size={26} />} title="En buen estado" value={registros.filter(r => ["Bueno", "Operativo"].includes(r.estado)).length} />
-        <KPI icon={<Filter size={26} />} title="En revisión" value={registros.filter(r => ["Revisión", "Mantenimiento"].includes(r.estado)).length} />
-        <KPI icon={<Filter size={26} />} title="Críticos" value={registros.filter(r => r.estado === "Regular").length} />
+        <KPI title="Total" value={registros.length} />
+        <KPI title="Funcionando" value={registros.filter(r => ["Bueno", "Operativo"].includes(r.estado)).length} />
+        <KPI title="En revisión" value={registros.filter(r => ["Revisión", "Mantenimiento"].includes(r.estado)).length} />
+        <KPI title="Críticos" value={registros.filter(r => r.estado === "Regular").length} />
       </div>
 
       {/* Filtros */}
       <div className="bg-white p-6 rounded-xl shadow-md border border-emerald-200 flex flex-col md:flex-row gap-4">
         
-        {/* Buscar */}
         <div className="flex-1 relative">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600" />
           <input
@@ -78,7 +85,6 @@ export default function CategoryView({ category, onBack }) {
           />
         </div>
 
-        {/* Estado */}
         <select
           value={estadoFilter}
           onChange={(e) => setEstadoFilter(e.target.value)}
@@ -92,7 +98,6 @@ export default function CategoryView({ category, onBack }) {
           <option value="Revisión">Revisión</option>
           <option value="Mantenimiento">Mantenimiento</option>
         </select>
-
       </div>
 
       {/* Tabla */}
@@ -110,10 +115,7 @@ export default function CategoryView({ category, onBack }) {
 
           <tbody>
             {filtrados.map((item, i) => (
-              <tr
-                key={i}
-                className="odd:bg-emerald-50 even:bg-white hover:bg-emerald-100 transition"
-              >
+              <tr key={i} className="odd:bg-emerald-50 even:bg-white hover:bg-emerald-100 transition">
                 <td className="px-4 py-3 font-semibold">{item.id}</td>
                 <td className="px-4 py-3">{item.aula}</td>
                 <td className="px-4 py-3">{item.docencia}</td>
@@ -127,15 +129,66 @@ export default function CategoryView({ category, onBack }) {
         </table>
       </div>
 
+      {/* Overlay */}
+      {openForm && (
+        <div className="fixed inset-0 bg-black/40 z-40" onClick={() => setOpenForm(false)}></div>
+      )}
+
+      {/* Side Panel */}
+      <div className={`fixed top-0 right-0 h-full w-[420px] bg-white shadow-xl border-l border-gray-200 z-50 transform transition-transform duration-300 ${openForm ? "translate-x-0" : "translate-x-full"}`}>
+        
+        {/* Header panel */}
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-xl font-semibold text-emerald-700">Agregar {category.slice(0, -1)}</h2>
+          <button onClick={() => setOpenForm(false)}>
+            <X size={22} className="text-gray-600 hover:text-black" />
+          </button>
+        </div>
+
+        {/* Body scrollable */}
+        <div className="p-4 overflow-y-auto max-h-[calc(100vh-110px)] space-y-4">
+          
+          <FormInput label="ID" placeholder="Ej: PC-01" />
+          <FormInput label="Aula" placeholder="Ej: 12" />
+          <FormInput label="Docencia" placeholder="Ej: Edificio B" />
+          <FormInput label="Fecha" type="date" />
+          
+          <div>
+            <label className="block font-medium text-gray-700 mb-1">Estado</label>
+            <select className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500">
+              <option>Bueno</option>
+              <option>Operativo</option>
+              <option>Regular</option>
+              <option>En uso</option>
+              <option>Revisión</option>
+              <option>Mantenimiento</option>
+            </select>
+          </div>
+
+        </div>
+
+        {/* Footer panel */}
+        <div className="p-4 border-t flex justify-end gap-2">
+          <button onClick={() => setOpenForm(false)} className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300">
+            Cancelar
+          </button>
+          <button className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700">
+            Guardar
+          </button>
+        </div>
+      </div>
+
     </div>
   );
 }
 
-/* KPI BONITO */
-function KPI({ icon, title, value }) {
+/* Subcomponentes */
+function KPI({ title, value }) {
   return (
     <div className="p-6 rounded-xl shadow-lg bg-white border border-gray-200 flex items-center gap-4">
-      <div className="text-emerald-600">{icon}</div>
+      <div className="text-emerald-600">
+        <Filter size={22} />
+      </div>
       <div>
         <p className="text-sm text-gray-500">{title}</p>
         <p className="text-2xl font-bold text-gray-800">{value}</p>
@@ -144,7 +197,6 @@ function KPI({ icon, title, value }) {
   );
 }
 
-/* BADGE DE ESTADO */
 function EstadoBadge({ estado }) {
   const styles = {
     "Bueno": "bg-green-200 text-green-800",
@@ -154,10 +206,18 @@ function EstadoBadge({ estado }) {
     "Revisión": "bg-orange-200 text-orange-800",
     "Mantenimiento": "bg-red-200 text-red-800",
   };
+  return <span className={`px-3 py-1 rounded-full text-sm font-semibold ${styles[estado]}`}>{estado}</span>;
+}
 
+function FormInput({ label, placeholder, type = "text" }) {
   return (
-    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${styles[estado]}`}>
-      {estado}
-    </span>
+    <div>
+      <label className="block font-medium text-gray-700 mb-1">{label}</label>
+      <input
+        type={type}
+        placeholder={placeholder}
+        className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500"
+      />
+    </div>
   );
 }
