@@ -4,6 +4,8 @@ import { Plus, Pencil, Copy, MinusCircle, X } from "lucide-react";
 export default function Usuario() {
   const [openForm, setOpenForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [filtroActivo, setFiltroActivo] = useState("activos"); // activos | inactivos | todos
 
   const [usuarios, setUsuarios] = useState([
     {
@@ -12,7 +14,17 @@ export default function Usuario() {
       correo: "tigrexteam@gmail.com",
       numEmpleado: "001",
       clave: "123",
-      rol: "Perron"
+      rol: "Perron",
+      activo: true
+    },
+    {
+      id: 2,
+      nombre: "Usuario Inactivo",
+      correo: "inactivo@correo.com",
+      numEmpleado: "002",
+      clave: "abc",
+      rol: "Docente",
+      activo: false
     }
   ]);
 
@@ -44,29 +56,37 @@ Rol: ${user.rol}
     navigator.clipboard.writeText(text.trim());
   };
 
-  // Borrar usuario
-  const handleDelete = (id) => {
-    setUsuarios(usuarios.filter((u) => u.id !== id));
+  // Inactivar usuario
+  const handleDelete = () => {
+    setUsuarios(
+      usuarios.map((u) =>
+        u.id === confirmDelete.id ? { ...u, activo: false } : u
+      )
+    );
+    setConfirmDelete(null);
   };
-
+const handleReactivate = (id) => {
+  setUsuarios(
+    usuarios.map(u =>
+      u.id === id ? { ...u, activo: true } : u
+    )
+  );
+};
   // Guardar (agregar o editar)
   const handleSave = () => {
     if (editingUser) {
-      // Editar
       setUsuarios(
         usuarios.map((u) =>
           u.id === editingUser.id ? { ...editingUser, ...formData } : u
         )
       );
     } else {
-      // Agregar
       setUsuarios([
         ...usuarios,
-        { id: usuarios.length + 1, ...formData }
+        { id: usuarios.length + 1, activo: true, ...formData }
       ]);
     }
 
-    // Reset
     setEditingUser(null);
     setFormData({
       nombre: "",
@@ -77,6 +97,13 @@ Rol: ${user.rol}
     });
     setOpenForm(false);
   };
+
+  // Filtrado por estado
+  const usuariosFiltrados = usuarios.filter((u) => {
+    if (filtroActivo === "activos") return u.activo;
+    if (filtroActivo === "inactivos") return !u.activo;
+    return true; // todos
+  });
 
   return (
     <div className="relative">
@@ -103,6 +130,19 @@ Rol: ${user.rol}
         </button>
       </div>
 
+      {/* Filtros */}
+      <div className="mb-4 flex gap-3">
+        <select
+          value={filtroActivo}
+          onChange={(e) => setFiltroActivo(e.target.value)}
+          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"
+        >
+          <option value="activos">Activos</option>
+          <option value="inactivos">Inactivos</option>
+          <option value="todos">Todos</option>
+        </select>
+      </div>
+
       {/* Tabla */}
       <div className="bg-white rounded-xl shadow-xl border border-emerald-200 overflow-x-auto">
         <table className="min-w-full text-left">
@@ -119,10 +159,12 @@ Rol: ${user.rol}
           </thead>
 
           <tbody>
-            {usuarios.map((u) => (
+            {usuariosFiltrados.map((u) => (
               <tr
                 key={u.id}
-                className="odd:bg-emerald-50 even:bg-white hover:bg-emerald-100 transition"
+                className={`hover:bg-emerald-100 transition ${
+                  u.activo ? "odd:bg-emerald-50 even:bg-white" : "bg-red-50"
+                }`}
               >
                 <td className="px-4 py-3 font-semibold">{u.id}</td>
                 <td className="px-4 py-3">{u.nombre}</td>
@@ -146,12 +188,22 @@ Rol: ${user.rol}
                     <Copy size={18} />
                   </button>
 
-                  <button
-                    className="text-red-600 hover:text-red-800"
-                    onClick={() => handleDelete(u.id)}
-                  >
-                    <MinusCircle size={18} />
-                  </button>
+                  {u.activo && (
+                    <button
+                      className="text-red-600 hover:text-red-800"
+                      onClick={() => setConfirmDelete(u)}
+                    >
+                      <MinusCircle size={18} />
+                    </button>
+                  )}
+                  {!u.activo && (
+  <button
+    className="text-green-600 hover:text-green-800"
+    onClick={() => handleReactivate(u.id)}
+  >
+    <Plus size={18} />
+  </button>
+)}
                 </td>
               </tr>
             ))}
@@ -208,10 +260,10 @@ Rol: ${user.rol}
           />
 
           <FormInput
-             label="Clave"
-             type="password"
-             value={formData.clave}
-             onChange={(v) => setFormData({ ...formData, clave: v })}
+            label="Clave"
+            type="password"
+            value={formData.clave}
+            onChange={(v) => setFormData({ ...formData, clave: v })}
           />
 
           <div>
@@ -248,6 +300,41 @@ Rol: ${user.rol}
           </button>
         </div>
       </div>
+
+      {/* Modal de confirmación */}
+      {confirmDelete && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[60]">
+          <div className="bg-white w-[380px] rounded-xl shadow-xl p-6 border border-emerald-200 animate-fadeIn">
+
+            <h2 className="text-xl font-bold text-emerald-700 mb-2">
+              ¿Inactivar usuario?
+            </h2>
+
+            <p className="text-gray-700 mb-6">
+              ¿Seguro que quieres inactivar al usuario{" "}
+              <strong>{confirmDelete.nombre}</strong>?  
+              Podrás reactivarlo más adelante.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setConfirmDelete(null)}
+                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition"
+              >
+                Cancelar
+              </button>
+
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+              >
+                Inactivar
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
