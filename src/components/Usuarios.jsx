@@ -128,7 +128,7 @@ Rol: ${user.rol}
                 <td className="px-4 py-3">{u.nombre}</td>
                 <td className="px-4 py-3">{u.correo}</td>
                 <td className="px-4 py-3">{u.numEmpleado}</td>
-                <td className="px-4 py-3">{u.clave}</td>
+                <td className="px-4 py-3">{"*".repeat(u.clave.length)}</td>
                 <td className="px-4 py-3">{u.rol}</td>
 
                 <td className="px-4 py-3 flex gap-3">
@@ -208,9 +208,10 @@ Rol: ${user.rol}
           />
 
           <FormInput
-            label="Clave"
-            value={formData.clave}
-            onChange={(v) => setFormData({ ...formData, clave: v })}
+             label="Clave"
+             type="password"
+             value={formData.clave}
+             onChange={(v) => setFormData({ ...formData, clave: v })}
           />
 
           <div>
@@ -251,7 +252,6 @@ Rol: ${user.rol}
   );
 }
 
-/* Input reutilizable */
 function FormInput({ label, value, onChange, type = "text" }) {
   return (
     <div>
