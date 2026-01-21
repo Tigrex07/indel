@@ -9,7 +9,12 @@ import {
   Book,
   Building2,
   Search,
-  ChevronDown
+  ChevronDown,
+  Armchair,
+  Cctv,
+  BusFront,
+  Toolbox,
+
 } from "lucide-react";
 
 export default function ActivosSection({ onOpenCategory }) {
@@ -25,14 +30,14 @@ export default function ActivosSection({ onOpenCategory }) {
   ];
 
   const categories = [
-    { label: "Computadoras", icon: <Laptop size={32} />, group: "Informática" },
-    { label: "Monitores", icon: <Monitor size={32} />, group: "Informática" },
-    { label: "Teclados y Mouse", icon: <Mouse size={32} />, group: "Informática" },
-    { label: "Teles", icon: <Tv size={32} />, group: "Audiovisual" },
-    { label: "Proyectores", icon: <Projector size={32} />, group: "Audiovisual" },
-    { label: "Impresoras", icon: <Printer size={32} />, group: "Informática" },
-    { label: "Escritorios", icon: <Book size={32} />, group: "Mobiliario" },
-    { label: "Edificios", icon: <Building2 size={32} />, group: "Edificios" }
+    { label: "Equipo de Computo", icon: <Laptop size={32} />, group: "Informática" },
+    { label: "Equipo de transporte", icon: <BusFront size={32} />, group: "Informática" },
+    { label: "Mobiliario y Equipo de Oficina", icon: <Armchair size={32} />, group: "Informática" },
+    { label: "Equipo de Foto Cine y Grabacion (Camaras)", icon: <Cctv size={32} />, group: "Audiovisual" },
+    { label: "Equipo de aparatos de Comunicaciones y Transportes", icon: <Projector size={32} />, group: "Audiovisual" },
+    { label: "Herramientas y Maquinas", icon: <Toolbox size={32} />, group: "Informática" },
+    { label: "Equipo de Laboratorio", icon: <Book size={32} />, group: "Mobiliario" },
+    { label: "Maquinaria y Equipo", icon: <Building2 size={32} />, group: "Edificios" }
   ];
 
   const filtered = categories.filter(c =>
