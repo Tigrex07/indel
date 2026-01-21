@@ -10,15 +10,14 @@ import {
   Settings,
   LogOut
 } from "lucide-react";
-
-import DashboardHome from "../components/DashboardHome.jsx";
+import Usuario from "../components/Usuarios.jsx";
+import DashboardHome from "../components/dashboardHome.jsx";
 
 const sections = [
   { key: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
   { key: "activos", label: "Activos", icon: <Package size={20} /> },
   { key: "bajas", label: "Bajas", icon: <Trash2 size={20} /> },
   { key: "transferencias", label: "Transferencias", icon: <Repeat size={20} /> },
-  { key: "encargados", label: "Encargados", icon: <User size={20} /> },
   { key: "usuarios", label: "Usuarios", icon: <Users size={20} /> },
   { key: "reportes", label: "Reportes", icon: <FileText size={20} /> },
   { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> },
@@ -34,7 +33,7 @@ export default function Dashboard({ username, onLogout, onOpenCategory }) {
       <aside className="w-72 bg-gradient-to-b from-emerald-600 to-emerald-900 text-white flex flex-col p-6 shadow-2xl">
 
         <h2 className="text-2xl font-bold mb-8 tracking-wide text-emerald-200">
-          Inventario Escolar
+             Indeltario
         </h2>
 
         {/* Opciones */}
@@ -94,6 +93,8 @@ export default function Dashboard({ username, onLogout, onOpenCategory }) {
 function SectionRenderer({ section, onOpenCategory }) {
   switch (section) {
 
+        case "usuarios":
+      return <Usuario />; 
     case "dashboard":
       return <DashboardHome />;
 

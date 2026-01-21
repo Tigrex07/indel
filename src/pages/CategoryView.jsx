@@ -51,7 +51,7 @@ export default function CategoryView({ category, onBack }) {
             onClick={() => setOpenForm(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition"
           >
-            <Plus size={18} /> Agregar {category.slice(0, -1)}
+            <Plus size={18} /> Agregar Activo{category.slice(0, 0)}
           </button>
 
           <button
@@ -139,7 +139,7 @@ export default function CategoryView({ category, onBack }) {
         
         {/* Header panel */}
         <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-semibold text-emerald-700">Agregar {category.slice(0, -1)}</h2>
+          <h2 className="text-xl font-semibold text-emerald-700">Agregar Activo{category.slice(0, 0)}</h2>
           <button onClick={() => setOpenForm(false)}>
             <X size={22} className="text-gray-600 hover:text-black" />
           </button>
