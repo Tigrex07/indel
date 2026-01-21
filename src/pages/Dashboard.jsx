@@ -4,14 +4,15 @@ import {
   Package,
   Trash2,
   Repeat,
-  User,
   Users,
   FileText,
   Settings,
   LogOut
 } from "lucide-react";
+
 import Usuario from "../components/Usuarios.jsx";
-import DashboardHome from "../components/dashboardHome.jsx";
+import DashboardHome from "../components/DashboardHome.jsx";
+import ActivosSection from "../components/ActivosSection.jsx";
 
 const sections = [
   { key: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
@@ -31,21 +32,21 @@ export default function Dashboard({ username, onLogout, onOpenCategory }) {
 
       {/* SIDEBAR */}
       <aside className="w-72 bg-gradient-to-b from-emerald-600 to-emerald-900 text-white flex flex-col p-6 shadow-2xl">
-
         <h2 className="text-2xl font-bold mb-8 tracking-wide text-emerald-200">
-             Indeltario
+          Indeltario
         </h2>
 
-        {/* Opciones */}
         <nav className="space-y-2">
           {sections.map((s) => (
             <button
               key={s.key}
               onClick={() => setActiveSection(s.key)}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-lg transition-all duration-300 
-                ${activeSection === s.key 
-                  ? "bg-emerald-400 text-black shadow-lg scale-105" 
-                  : "hover:bg-emerald-300 hover:text-black"}`}
+                ${
+                  activeSection === s.key
+                    ? "bg-emerald-400 text-black shadow-lg scale-105"
+                    : "hover:bg-emerald-300 hover:text-black"
+                }`}
             >
               {s.icon}
               <span className="font-semibold">{s.label}</span>
@@ -53,12 +54,11 @@ export default function Dashboard({ username, onLogout, onOpenCategory }) {
           ))}
         </nav>
 
-        {/* Bienvenida */}
-        <div className="mt-auto pt-6 text-sm text-emerald-200 opacity-80">
-          Bienvenido, <span className="font-semibold text-white">{username}</span>
+        <div className="mt-auto pt-6 text-sm text-emerald-200">
+          Bienvenido,{" "}
+          <span className="font-semibold text-white">{username}</span>
         </div>
 
-        {/* Botón de cerrar sesión */}
         <button
           onClick={onLogout}
           className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition"
@@ -66,25 +66,18 @@ export default function Dashboard({ username, onLogout, onOpenCategory }) {
           <LogOut size={18} />
           Cerrar sesión
         </button>
-
       </aside>
 
       {/* MAIN */}
       <main className="flex-1 p-10 space-y-10">
+        <h1 className="text-3xl font-extrabold text-emerald-700 tracking-wide">
+          Panel de Control
+        </h1>
 
-        {/* Header sin filtros */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-extrabold text-emerald-700 tracking-wide">
-            Panel de Control
-          </h1>
-        </div>
-
-        {/* Sección dinámica */}
-        <SectionRenderer 
-          section={activeSection} 
-          onOpenCategory={onOpenCategory} 
+        <SectionRenderer
+          section={activeSection}
+          onOpenCategory={onOpenCategory}
         />
-
       </main>
     </div>
   );
@@ -92,14 +85,14 @@ export default function Dashboard({ username, onLogout, onOpenCategory }) {
 
 function SectionRenderer({ section, onOpenCategory }) {
   switch (section) {
-
-        case "usuarios":
-      return <Usuario />; 
     case "dashboard":
       return <DashboardHome />;
 
+    case "usuarios":
+      return <Usuario />;
+
     case "activos":
-      return <ActivosSection onOpenCategory={onOpenCategory} />;
+      return <ActivosSection />;
 
     default:
       return (
@@ -110,24 +103,3 @@ function SectionRenderer({ section, onOpenCategory }) {
   }
 }
 
-function ActivosSection({ onOpenCategory }) {
-  const categories = ["Escritorios", "Teles", "Computadoras", "Proyectores"];
-
-  return (
-    <div className="bg-white rounded-xl shadow-xl p-8 border border-emerald-200">
-      <h2 className="text-xl font-bold text-emerald-600 mb-6">Activos registrados</h2>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => onOpenCategory(cat)}
-            className="bg-emerald-100 rounded-lg p-6 text-center shadow hover:shadow-lg hover:bg-emerald-200 transition-all duration-300"
-          >
-            <p className="text-sm font-semibold text-gray-800">{cat}</p>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
