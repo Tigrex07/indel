@@ -11,8 +11,10 @@ import {
 } from "lucide-react";
 
 import Usuario from "../components/Usuarios.jsx";
-import DashboardHome from "../components/DashboardHome.jsx";
+import DashboardHome from "../components/Dashboardhome.jsx";
 import ActivosSection from "../components/ActivosSection.jsx";
+import Bajas from "../components/Bajas.jsx";
+
 
 const sections = [
   { key: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
@@ -85,6 +87,9 @@ export default function Dashboard({ username, onLogout, onOpenCategory }) {
 
 function SectionRenderer({ section, onOpenCategory }) {
   switch (section) {
+    case "bajas":
+      return <Bajas />;
+
     case "dashboard":
       return <DashboardHome />;
 

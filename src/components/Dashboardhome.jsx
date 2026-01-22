@@ -1,5 +1,6 @@
 import { Search, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Building2, Layers, Users, CheckCircle } from "lucide-react";
 
 export default function DashboardHome() {
   const [query, setQuery] = useState("");
@@ -21,6 +22,11 @@ export default function DashboardHome() {
       })
       .catch(() => setLoading(false));
   }, []);
+  // KPIs calculados
+const totalActivos = data.length;
+const totalEdificios = new Set(data.map((i) => i.edificio)).size;
+const totalGrupos = new Set(data.map((i) => i.grupo)).size;
+const activosFuncionando = data.filter((i) => i.activo === "Sí" || i.activo === 1).length;
 
   // 🔹 Filtro compatible con números y texto
   const filtrado = data.filter((item) => {
@@ -49,7 +55,54 @@ export default function DashboardHome() {
       <h1 className="text-2xl font-bold text-emerald-700">
         Dashboard general
       </h1>
+{/* KPIs */}
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
+  {/* Total Activos */}
+  <div className="bg-white border border-emerald-200 rounded-xl p-5 shadow flex items-center gap-4">
+    <div className="bg-emerald-600 text-white p-3 rounded-lg">
+      <Layers size={28} />
+    </div>
+    <div>
+      <p className="text-gray-600 text-sm">Total de Activos</p>
+      <p className="text-2xl font-bold text-emerald-700">{totalActivos}</p>
+    </div>
+  </div>
+
+  {/* Edificios */}
+  <div className="bg-white border border-emerald-200 rounded-xl p-5 shadow flex items-center gap-4">
+    <div className="bg-blue-600 text-white p-3 rounded-lg">
+      <Building2 size={28} />
+    </div>
+    <div>
+      <p className="text-gray-600 text-sm">Edificios</p>
+      <p className="text-2xl font-bold text-blue-700">{totalEdificios}</p>
+    </div>
+  </div>
+
+  {/* Grupos */}
+  <div className="bg-white border border-emerald-200 rounded-xl p-5 shadow flex items-center gap-4">
+    <div className="bg-purple-600 text-white p-3 rounded-lg">
+      <Users size={28} />
+    </div>
+    <div>
+      <p className="text-gray-600 text-sm">Grupos</p>
+      <p className="text-2xl font-bold text-purple-700">{totalGrupos}</p>
+    </div>
+  </div>
+
+  {/* Activos funcionando */}
+  <div className="bg-white border border-emerald-200 rounded-xl p-5 shadow flex items-center gap-4">
+    <div className="bg-green-600 text-white p-3 rounded-lg">
+      <CheckCircle size={28} />
+    </div>
+    <div>
+      <p className="text-gray-600 text-sm">Funcionando</p>
+      <p className="text-2xl font-bold text-green-700">{activosFuncionando}</p>
+    </div>
+  </div>
+
+</div>
       {/* FILTROS */}
       <div className="bg-white border border-emerald-200 rounded-xl p-5 shadow space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

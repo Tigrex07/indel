@@ -15,28 +15,25 @@ export default function Login({ onLogin }) {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "https://corporacionperris.com/backend/login.php",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            numEmpleado: username,
-            clave: password,
-          }),
-        }
-      );
+      const response = await fetch("https://corporacionperris.com/backend/login.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          numEmpleado: username,
+          clave: password,
+        }),
+      });
 
       const data = await response.json();
 
       if (data.success) {
         setMensaje("✅ " + data.message);
-        onLogin(data.nombre); // SOLO entra si backend lo permite
+        // Pasamos el nombre real al App.jsx
+        onLogin(data.nombre); // ← asegúrate que el backend devuelve { success: true, nombre: "Viktor" }
       } else {
         setMensaje("❌ " + data.message);
       }
-
     } catch (error) {
       setMensaje("❌ Error al conectar con el servidor");
     } finally {
@@ -49,9 +46,12 @@ export default function Login({ onLogin }) {
       className="relative flex items-center justify-center min-h-screen bg-cover bg-center"
       style={{ backgroundImage: `url(${fondoUtn})` }}
     >
+      {/* Overlay */}
       <div className="absolute inset-0 bg-black/40"></div>
 
+      {/* Contenedor */}
       <div className="relative w-full max-w-lg bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-10 border border-green-300">
+        {/* Logos */}
         <div className="flex justify-center items-center gap-8 mb-8">
           <img src={utnLogo} alt="UTN Logo" className="h-20 drop-shadow-lg" />
           <img src={tiLogo} alt="TI Logo" className="h-20 drop-shadow-lg" />
