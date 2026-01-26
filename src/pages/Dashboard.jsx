@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Package,
@@ -26,8 +26,21 @@ const sections = [
   { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> },
 ];
 
-export default function Dashboard({ username, onLogout, onOpenCategory }) {
+
+  export default function Dashboard({ onLogout, onOpenCategory }) {
   const [activeSection, setActiveSection] = useState("dashboard");
+  const [username, setUsername] = useState(""); // 👈 aquí guardaremos el nombre
+
+   useEffect(() => {
+    fetch("https://corporacionperris.com/backend/api/me.php", {
+      method: "GET",
+      credentials: "include", // 👈 enviar cookie PHP
+    }).then(res => res.json())
+      .then(json => {
+        if (json.success) setUsername(json.usuario.nombre);
+      })
+      .catch(err => console.error("Error al obtener usuario:", err));
+  }, []);
 
   return (
     <div className="min-h-screen flex bg-emerald-50 text-gray-900">
@@ -57,9 +70,9 @@ export default function Dashboard({ username, onLogout, onOpenCategory }) {
         </nav>
 
         <div className="mt-auto pt-6 text-sm text-emerald-200">
-          Bienvenido,{" "}
-          <span className="font-semibold text-white">{username}</span>
-        </div>
+  Bienvenido,{" "}
+  <span className="font-semibold text-white">{username}</span>
+</div>
 
         <button
           onClick={onLogout}
