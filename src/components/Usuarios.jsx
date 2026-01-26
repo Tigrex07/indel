@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Pencil, Copy, MinusCircle, X } from "lucide-react";
 
-const API_URL = "https://corporacionperris.com/backend/usuarios.php";
+const API_URL = "https://corporacionperris.com/backend/api/usuarios.php";
 
 export default function Usuario() {
   const [openForm, setOpenForm] = useState(false);
@@ -26,11 +26,21 @@ export default function Usuario() {
     fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include", // ← IMPORTANTE para sesión PHP
       body: JSON.stringify({ action: "read" }),
     })
       .then(res => res.json())
       .then(json => {
-        if (json.success) setUsuarios(json.data);
+        if (json.success && Array.isArray(json.data)) {
+          setUsuarios(json.data); // asegura que sea arreglo
+        } else {
+          console.error("Error al traer usuarios:", json.message);
+          setUsuarios([]); // por si falla, evitar undefined
+        }
+      })
+      .catch(err => {
+        console.error("Error fetch:", err);
+        setUsuarios([]); // fallback
       });
   };
 
@@ -47,7 +57,7 @@ export default function Usuario() {
       nombre: user.nombre,
       correo: user.correo,
       numEmpleado: user.numEmpleado,
-      clave: user.clave,
+      clave: "", // no mostrar hash en formulario
       rol: user.rol
     });
     setOpenForm(true);
@@ -74,6 +84,7 @@ Rol: ${user.rol}
     fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({
         action: "toggle",
         id: confirmDelete.id,
@@ -89,6 +100,7 @@ Rol: ${user.rol}
     fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({
         action: "toggle",
         id,
@@ -104,6 +116,7 @@ Rol: ${user.rol}
     fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({
         action: editingUser ? "update" : "create",
         ...(editingUser && { id: editingUser.id }),
@@ -126,11 +139,11 @@ Rol: ${user.rol}
   /* =========================
      FILTRO
   ========================= */
-  const usuariosFiltrados = usuarios.filter((u) => {
+  const usuariosFiltrados = usuarios?.filter((u) => {
     if (filtroActivo === "activos") return u.activo == 1;
     if (filtroActivo === "inactivos") return u.activo == 0;
     return true;
-  });
+  }) || []; // fallback a arreglo vacío
 
   return (
     <div className="relative">
@@ -197,7 +210,7 @@ Rol: ${user.rol}
                 <td className="px-4 py-3">{u.nombre}</td>
                 <td className="px-4 py-3">{u.correo}</td>
                 <td className="px-4 py-3">{u.numEmpleado}</td>
-                <td className="px-4 py-3">{"*".repeat(u.clave.length)}</td>
+                <td className="px-4 py-3">{"*".repeat(u.clave?.length || 8)}</td>
                 <td className="px-4 py-3">{u.rol}</td>
 
                 <td className="px-4 py-3 flex gap-3">

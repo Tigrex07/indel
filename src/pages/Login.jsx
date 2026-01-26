@@ -15,7 +15,7 @@ export default function Login({ onLogin }) {
     setLoading(true);
 
     try {
-      const response = await fetch("https://corporacionperris.com/backend/login.php", {
+      const response = await fetch("https://corporacionperris.com/backend/auth/login.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
