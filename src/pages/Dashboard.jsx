@@ -29,10 +29,7 @@ const sections = [
   { key: "reportes", label: "Reportes", icon: <FileText size={20} /> },
   { key: "solicitarBaja", label: "SolicitarBaja", icon: <FileMinus size={20} /> },
   { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> },
-  { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> },
-  { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> },
-  { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> },
-  { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> },
+
   
 
 ];
@@ -136,4 +133,5 @@ function SectionRenderer({ section, onOpenCategory }) {
       );
   }
 }
+
 
