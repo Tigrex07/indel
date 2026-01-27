@@ -7,13 +7,17 @@ import {
   Users,
   FileText,
   Settings,
-  LogOut
+  LogOut,
+  Text,
+  FileMinus,
+  FileMinus2
 } from "lucide-react";
 
 import Usuario from "../components/Usuarios.jsx";
 import DashboardHome from "../components/Dashboardhome.jsx";
 import ActivosSection from "../components/ActivosSection.jsx";
 import Bajas from "../components/Bajas.jsx";
+import SolicitarBaja from "../pages/SolicitarBaja.jsx"
 
 
 const sections = [
@@ -23,7 +27,14 @@ const sections = [
   { key: "transferencias", label: "Transferencias", icon: <Repeat size={20} /> },
   { key: "usuarios", label: "Usuarios", icon: <Users size={20} /> },
   { key: "reportes", label: "Reportes", icon: <FileText size={20} /> },
+  { key: "solicitarBaja", label: "SolicitarBaja", icon: <FileMinus size={20} /> },
   { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> },
+  { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> },
+  { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> },
+  { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> },
+  { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> },
+  
+
 ];
 
 
@@ -41,6 +52,8 @@ const sections = [
       })
       .catch(err => console.error("Error al obtener usuario:", err));
   }, []);
+
+
 
   return (
     <div className="min-h-screen flex bg-emerald-50 text-gray-900">
@@ -111,6 +124,9 @@ function SectionRenderer({ section, onOpenCategory }) {
 
     case "activos":
       return <ActivosSection />;
+
+    case "solicitarBaja":
+        return <SolicitarBaja />
 
     default:
       return (
