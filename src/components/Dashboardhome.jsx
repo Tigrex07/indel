@@ -31,9 +31,7 @@ export default function DashboardHome() {
       .catch(() => setLoading(false));
   }, []);
 
-  /* =========================
-     KPIs
-  ========================= */
+
   const totalActivos = data.length;
   const totalEdificios = new Set(data.map((i) => i.edificio)).size;
   const totalGrupos = new Set(data.map((i) => i.grupo)).size;
