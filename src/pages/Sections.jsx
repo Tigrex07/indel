@@ -12,7 +12,7 @@ import {
 
 export const sections = [
   { key: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
-  { key: "activos", label: "Activos", icon: <Package size={20} /> },
+  { key: "activos", label: "Grupos", icon: <Package size={20} /> },
   { key: "bajas", label: "Bajas", icon: <Trash2 size={20} /> },
   { key: "transferencias", label: "Transferencias", icon: <Repeat size={20} /> },
   { key: "usuarios", label: "Usuarios", icon: <Users size={20} /> },
