@@ -57,13 +57,13 @@ export default function ActivosSection({ onOpenCategory }) {
 
       {/* GRID */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {filtered.map(({ idGrupo, clave, nombre, icon: Icon }) => (
+        {filtered.map(({ idGrupo, clave, nombre }) => (
           <button
             key={idGrupo}
             onClick={() => onOpenCategory?.(clave)}
             className="text-left border rounded-xl p-5 shadow hover:shadow-lg hover:bg-emerald-100 transition-all duration-300"
           >
-            <Icon size={32} className="text-emerald-600 mb-3" />
+          
             <p className="text-sm text-gray-500 font-semibold">
               {clave}
             </p>
