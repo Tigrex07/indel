@@ -2,27 +2,30 @@ import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import SectionRenderer from "./SectionRenderer";
 
-export default function Dashboard({ onLogout, onOpenCategory }) {
+export default function Dashboard({ onLogout }) {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [username, setUsername] = useState("");
+  const [grupoSeleccionado, setGrupoSeleccionado] = useState(null);
 
   useEffect(() => {
     fetch("https://corporacionperris.com/backend/api/me.php", {
       method: "GET",
-      credentials: "include"
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((json) => {
         if (json.success) setUsername(json.usuario.nombre);
-      })
-      .catch(err => console.error("Error al obtener usuario:", err));
+      });
   }, []);
 
   return (
     <div className="min-h-screen flex bg-emerald-50 text-gray-900">
       <Sidebar
         activeSection={activeSection}
-        setActiveSection={setActiveSection}
+        setActiveSection={(sec) => {
+          setActiveSection(sec);
+          setGrupoSeleccionado(null);
+        }}
         username={username}
         onLogout={onLogout}
       />
@@ -34,7 +37,11 @@ export default function Dashboard({ onLogout, onOpenCategory }) {
 
         <SectionRenderer
           section={activeSection}
-          onOpenCategory={onOpenCategory}
+          grupoSeleccionado={grupoSeleccionado}
+          onOpenCategory={(clave) => {
+            setGrupoSeleccionado(clave);
+            setActiveSection("activos");
+          }}
         />
       </main>
     </div>
