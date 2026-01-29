@@ -1,25 +1,37 @@
 import Usuario from "../components/Usuarios.jsx";
 import DashboardHome from "../components/Dashboardhome.jsx";
 import ActivosSection from "../components/ActivosSection.jsx";
+import ActivosGrupo from "../components/ActivosGrupo.jsx";
 import Bajas from "../components/Bajas.jsx";
 import SolicitarBaja from "./SolicitarBaja.jsx";
 
-export default function SectionRenderer({ section, onOpenCategory }) {
+export default function SectionRenderer({
+  section,
+  grupoSeleccionado,
+  onOpenCategory
+}) {
   switch (section) {
-    case "bajas":
-      return <Bajas />;
-
     case "dashboard":
       return <DashboardHome />;
 
     case "usuarios":
       return <Usuario />;
 
-    case "activos":
-      return <ActivosSection />;
+    case "bajas":
+      return <Bajas />;
 
     case "solicitarBaja":
       return <SolicitarBaja />;
+
+    case "activos":
+      return grupoSeleccionado ? (
+        <ActivosGrupo
+          grupoClave={grupoSeleccionado}
+          onBack={() => onOpenCategory(null)}
+        />
+      ) : (
+        <ActivosSection onOpenCategory={onOpenCategory} />
+      );
 
     default:
       return (
