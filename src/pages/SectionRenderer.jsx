@@ -4,6 +4,7 @@ import ActivosSection from "../components/ActivosSection.jsx";
 import ActivosGrupo from "../components/ActivosGrupo.jsx";
 import Bajas from "../components/Bajas.jsx";
 import SolicitarBaja from "./SolicitarBaja.jsx";
+import Transferencias from "./Transferencias.jsx";
 
 export default function SectionRenderer({
   section,
@@ -32,6 +33,9 @@ export default function SectionRenderer({
       ) : (
         <ActivosSection onOpenCategory={onOpenCategory} />
       );
+
+    case "transferencias":
+      return <Transferencias />
 
     default:
       return (
