@@ -43,25 +43,17 @@ export default function SectionRenderer({
     case "edificios":
   return edificioSeleccionado ? (
     <AulasSection
-      idEdificio={edificioSeleccionado}
-      onBack={() => setEdificioSeleccionado(null)}
-    />
+  idEdificio={edificioSeleccionado.id}   // 👈 SOLO EL ID
+  nombreEdificio={edificioSeleccionado.nombre}
+  claveEdificio={edificioSeleccionado.clave}
+  onBack={() => setEdificioSeleccionado(null)}
+/>
   ) : (
     <EdificiosSection
-      onSelectEdificio={(id) => setEdificioSeleccionado(id)}
+      onSelectEdificio={setEdificioSeleccionado}
     />
   );
 
-      case "aulas":
-  return (
-    <AulasSection
-      idEdificio={edificioSeleccionado}
-      onBack={() => {
-        setEdificioSeleccionado(null);
-        setSection("edificios");
-      }}
-    />
-  );
 
     default:
       return (
