@@ -1,31 +1,42 @@
 import { useEffect, useState } from "react";
 import { Search, DoorOpen } from "lucide-react";
 
-const API_URL =
-  "https://corporacionperris.com/backend/api/aulas.php";
+const API_URL = "https://corporacionperris.com/backend/api/aulas.php";
 
 export default function AulasSection({ idEdificio, onBack }) {
   const [search, setSearch] = useState("");
   const [aulas, setAulas] = useState([]);
 
-  useEffect(() => {
-    fetch(`${API_URL}?edificio=${idEdificio}`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success) setAulas(json.data);
-      });
-  }, [idEdificio]);
+useEffect(() => {
+  if (!idEdificio) return;
 
-  const filtered = aulas.filter((a) =>
-    a.nombre.toLowerCase().includes(search.toLowerCase()) ||
-    a.clave.toString().includes(search)
+  fetch(`${API_URL}?edificio=${idEdificio}`, {
+    credentials: "include",
+  })
+    .then(res => res.json())
+    .then(json => {
+      if (json.success) setAulas(json.data);
+    });
+}, [idEdificio]);
+
+  if (!idEdificio) {
+    return (
+      <div className="bg-white p-10 rounded-xl shadow border">
+        <p className="text-gray-600">
+          Selecciona un edificio…
+        </p>
+      </div>
+    );
+  }
+
+  const filtered = aulas.filter(
+    (a) =>
+      a.nombre.toLowerCase().includes(search.toLowerCase()) ||
+      a.clave.toString().includes(search)
   );
 
   return (
     <div className="bg-white rounded-xl shadow-xl p-8 border border-emerald-200 space-y-8">
-      
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <button
