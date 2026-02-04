@@ -4,12 +4,18 @@ import ActivosSection from "../components/ActivosSection.jsx";
 import ActivosGrupo from "../components/ActivosGrupo.jsx";
 import Bajas from "../components/Bajas.jsx";
 import SolicitarBaja from "./SolicitarBaja.jsx";
-import Edificios from "../components/Edificios.jsx";
+import AulasSection from "../components/AulasSection.jsx";
+import EdificiosSection from "../components/EdificiosSection.jsx";
+
+
+
 
 export default function SectionRenderer({
   section,
   grupoSeleccionado,
-  onOpenCategory
+  onOpenCategory,
+   edificioSeleccionado,
+  setEdificioSeleccionado
 }) {
   switch (section) {
     case "dashboard":
@@ -35,7 +41,27 @@ export default function SectionRenderer({
       );
 
     case "edificios":
-      return <Edificios />
+  return edificioSeleccionado ? (
+    <AulasSection
+      idEdificio={edificioSeleccionado}
+      onBack={() => setEdificioSeleccionado(null)}
+    />
+  ) : (
+    <EdificiosSection
+      onSelectEdificio={(id) => setEdificioSeleccionado(id)}
+    />
+  );
+
+      case "aulas":
+  return (
+    <AulasSection
+      idEdificio={edificioSeleccionado}
+      onBack={() => {
+        setEdificioSeleccionado(null);
+        setSection("edificios");
+      }}
+    />
+  );
 
     default:
       return (
