@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import SectionRenderer from "./SectionRenderer";
@@ -6,6 +7,10 @@ export default function Dashboard({ onLogout }) {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [username, setUsername] = useState("");
   const [grupoSeleccionado, setGrupoSeleccionado] = useState(null);
+
+  //edificio y aulas
+const [section, setSection] = useState("edificios");
+const [edificioSeleccionado, setEdificioSeleccionado] = useState(null);
 
   useEffect(() => {
     fetch("https://corporacionperris.com/backend/api/me.php", {
@@ -38,11 +43,13 @@ export default function Dashboard({ onLogout }) {
         <SectionRenderer
           section={activeSection}
           grupoSeleccionado={grupoSeleccionado}
+          edificioSeleccionado={edificioSeleccionado}
+          setEdificioSeleccionado={setEdificioSeleccionado}
           onOpenCategory={(clave) => {
             setGrupoSeleccionado(clave);
             setActiveSection("activos");
           }}
-        />
+          />
       </main>
     </div>
   );
