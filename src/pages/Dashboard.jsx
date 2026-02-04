@@ -9,7 +9,7 @@ export default function Dashboard({ onLogout }) {
   const [grupoSeleccionado, setGrupoSeleccionado] = useState(null);
 
   //edificio y aulas
-const [section, setSection] = useState("edificios");
+
 const [edificioSeleccionado, setEdificioSeleccionado] = useState(null);
 
   useEffect(() => {
