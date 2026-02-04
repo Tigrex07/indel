@@ -30,15 +30,14 @@ const [edificioSeleccionado, setEdificioSeleccionado] = useState(null);
         setActiveSection={(sec) => {
           setActiveSection(sec);
           setGrupoSeleccionado(null);
+          setEdificioSeleccionado(null);
         }}
         username={username}
         onLogout={onLogout}
       />
 
       <main className="flex-1 p-10 space-y-10">
-        <h1 className="text-3xl font-extrabold text-emerald-700 tracking-wide">
-          Panel de Control
-        </h1>
+        
 
         <SectionRenderer
           section={activeSection}
