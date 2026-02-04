@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import SectionRenderer from "./SectionRenderer";
@@ -6,21 +5,16 @@ import SectionRenderer from "./SectionRenderer";
 export default function Dashboard({ onLogout }) {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [username, setUsername] = useState("");
+
   const [grupoSeleccionado, setGrupoSeleccionado] = useState(null);
-
-  //edificio y aulas
-
-const [edificioSeleccionado, setEdificioSeleccionado] = useState(null);
+  const [edificioSeleccionado, setEdificioSeleccionado] = useState(null);
 
   useEffect(() => {
     fetch("https://corporacionperris.com/backend/api/me.php", {
-      method: "GET",
       credentials: "include",
     })
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success) setUsername(json.usuario.nombre);
-      });
+      .then(r => r.json())
+      .then(j => j.success && setUsername(j.usuario.nombre));
   }, []);
 
   return (
@@ -48,7 +42,7 @@ const [edificioSeleccionado, setEdificioSeleccionado] = useState(null);
             setGrupoSeleccionado(clave);
             setActiveSection("activos");
           }}
-          />
+        />
       </main>
     </div>
   );
