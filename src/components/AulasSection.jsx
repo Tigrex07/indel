@@ -3,12 +3,17 @@ import { Search, DoorOpen } from "lucide-react";
 
 const API_URL = "https://corporacionperris.com/backend/api/aulas.php";
 
-export default function AulasSection({ idEdificio, onBack }) {
+export default function AulasSection({
+  idEdificio,
+  nombreEdificio,
+  claveEdificio,
+  onBack
+}) {
   const [search, setSearch] = useState("");
   const [aulas, setAulas] = useState([]);
 
 useEffect(() => {
-  if (!idEdificio) return;
+  if (!idEdificio) return; // ⛑️ evita fetch inválido
 
   fetch(`${API_URL}?edificio=${idEdificio}`, {
     credentials: "include",
@@ -46,8 +51,11 @@ useEffect(() => {
           ← Volver a edificios
         </button>
 
-        <h2 className="text-2xl font-bold text-emerald-600">
-          Aulas
+        <h2 className="text-2xl font-bold text-emerald-700">
+          Aulas — {nombreEdificio}
+          <span className="ml-2 text-sm text-emerald-500 font-semibold">
+            ({claveEdificio})
+          </span>
         </h2>
       </div>
 
