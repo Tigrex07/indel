@@ -3,7 +3,7 @@ import { Search, Building2 } from "lucide-react";
 
 const API_URL = "https://corporacionperris.com/backend/api/edificios.php";
 
-export default function EdificiosSection({ onOpenBuilding }) {
+export default function EdificiosSection({ onSelectEdificio }) {
   const [search, setSearch] = useState("");
   const [catalogoEdificios, setCatalogoEdificios] = useState([]);
 
@@ -56,10 +56,10 @@ export default function EdificiosSection({ onOpenBuilding }) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {filtered.map(({ idEdificio, clave, nombre }) => (
           <button
-            key={idEdificio}
-            onClick={() => onOpenBuilding(clave)}
-            className="text-left border rounded-xl p-5 shadow hover:shadow-lg hover:bg-emerald-100 transition-all duration-300"
-          >
+              key={idEdificio}
+              onClick={() => onSelectEdificio(idEdificio)}
+              className="text-left border rounded-xl p-5 shadow hover:shadow-lg hover:bg-emerald-100 transition-all duration-300"
+            >
             <div className="flex items-center gap-2 mb-2 text-emerald-600">
               <Building2 size={18} />
               <span className="text-sm font-semibold">
