@@ -34,10 +34,11 @@ export default function SectionRenderer({
     case "activos":
       return grupoSeleccionado ? (
         <ActivosGrupo
-          grupoClave={grupoSeleccionado}
-          idGrupo={grupoSeleccionado}
-          onBack={() => onOpenCategory(null)}
-        />
+  grupoClave={grupoSeleccionado.clave}
+  grupoNombre={grupoSeleccionado.nombre}
+  idGrupo={grupoSeleccionado.id}
+  onBack={() => onOpenCategory(null)}
+/>
       ) : (
         <ActivosSection onOpenCategory={onOpenCategory} />
       );

@@ -7,7 +7,8 @@ const API_UPDATE = "https://corporacionperris.com/backend/api/inventario_update.
 
 const ITEMS_PER_PAGE = 10;
 
-export default function ActivosGrupo({ grupoClave, idGrupo, onBack }) {
+export default function ActivosGrupo({ grupoClave, grupoNombre, idGrupo, onBack })
+ {
   const [data, setData] = useState([]);
   const [busqueda, setBusqueda] = useState("");
   const [modal, setModal] = useState(false);
@@ -124,155 +125,174 @@ export default function ActivosGrupo({ grupoClave, idGrupo, onBack }) {
     setTimeout(() => setCopiado(""), 1200);
   };
 
-  return (
-    <div className="space-y-6">
+ return (
+  <div className="space-y-8">
 
-      {/* VOLVER */}
-      <button onClick={onBack} className="text-emerald-700 font-semibold">
-        ← Volver a grupos
+    {/* VOLVER */}
+    <button
+      onClick={() => onBack()}
+      className="text-emerald-700 font-semibold hover:underline flex items-center gap-1"
+    >
+      ← Volver a grupos
+    </button>
+
+    {/* HEADER */}
+    <div className="flex justify-between items-center">
+      <h2 className="text-3xl font-bold text-emerald-700 tracking-tight">
+  Activos · {grupoNombre}
+</h2>
+
+      <button
+        onClick={abrirNuevo}
+        className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition-all"
+      >
+        <Plus size={18} />
+        <span className="font-medium">Agregar</span>
       </button>
+    </div>
 
-      {/* HEADER */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-emerald-700">
-          Activos · {grupoClave}
-        </h2>
+    {/* BUSCADOR */}
+    <div className="relative max-w-md">
+      <Search
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600"
+        size={18}
+      />
+      <input
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+        placeholder="Buscar por nombre, aula, edificio o marbete"
+        className="w-full pl-10 pr-3 py-2.5 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all"
+      />
+    </div>
+
+    {/* TABLA */}
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-emerald-200">
+      <table className="w-full text-left">
+        <thead className="bg-emerald-600 text-white">
+          <tr>
+            <th className="p-3 font-semibold">Nombre</th>
+            <th className="p-3 font-semibold">Edificio</th>
+            <th className="p-3 font-semibold">Aula</th>
+            <th className="p-3 font-semibold">Activo</th>
+            <th className="p-3 font-semibold">Marbete</th>
+            <th className="p-3"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {paginaData.map((i) => {
+            const activo = i.marbete.split("-").pop();
+
+            return (
+              <tr
+                key={i.idActivo}
+                className="border-t hover:bg-emerald-50 transition-all"
+              >
+                <td className="p-3 font-medium text-gray-800">
+                  {i.nombre_activo}
+                </td>
+
+                <td className="p-3 text-gray-700">{i.edificio}</td>
+                <td className="p-3 text-gray-700">{i.aula}</td>
+
+                <td className="p-3">
+                  <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-mono text-sm shadow-sm">
+                    {activo}
+                  </span>
+                </td>
+
+                <td className="p-3 font-mono flex items-center gap-2 text-gray-700">
+                  {i.marbete}
+                  <button onClick={() => copiar(i.marbete)}>
+                    {copiado === i.marbete ? (
+                      <CheckCircle size={16} className="text-green-600" />
+                    ) : (
+                      <Copy size={16} className="text-gray-500 hover:text-gray-700" />
+                    )}
+                  </button>
+                </td>
+
+                <td className="p-3">
+                  <button
+                    onClick={() => abrirEditar(i)}
+                    className="text-gray-600 hover:text-emerald-700 transition"
+                  >
+                    <Pencil size={18} />
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+
+    {/* PAGINACIÓN */}
+    {totalPages > 1 && (
+      <div className="flex justify-between items-center pt-4">
+        <button
+          disabled={page === 1}
+          onClick={() => setPage((p) => p - 1)}
+          className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50 hover:bg-gray-300 transition"
+        >
+          Anterior
+        </button>
+
+        <span className="font-medium text-gray-700">
+          Página {page} de {totalPages}
+        </span>
 
         <button
-          onClick={abrirNuevo}
-          className="bg-emerald-600 text-white px-4 py-2 rounded-lg flex gap-2"
+          disabled={page === totalPages}
+          onClick={() => setPage((p) => p + 1)}
+          className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50 hover:bg-gray-300 transition"
         >
-          <Plus size={18}/> Agregar
+          Siguiente
         </button>
       </div>
+    )}
 
-      {/* BUSCADOR */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600" size={18}/>
-        <input
-          value={busqueda}
-          onChange={e => setBusqueda(e.target.value)}
-          placeholder="Buscar por nombre, aula, edificio o marbete"
-          className="w-full pl-10 pr-3 py-2 border rounded-lg"
-        />
-      </div>
+    {/* MODAL */}
+    {modal && (
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+        <div className="bg-white p-6 rounded-xl w-[400px] space-y-4 shadow-xl border border-emerald-200">
 
-      {/* TABLA */}
-      <div className="bg-white rounded-xl shadow overflow-hidden border border-emerald-200">
-        <table className="w-full text-left">
-          <thead className="bg-emerald-600 text-white">
-            <tr>
-              <th className="p-3">Nombre</th>
-              <th className="p-3">Edificio</th>
-              <th className="p-3">Aula</th>
-              <th className="p-3">Activo</th>
-              <th className="p-3">Marbete</th>
-              <th className="p-3"></th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {paginaData.map(i => {
-              const activo = i.marbete.split("-").pop();
-
-              return (
-                <tr key={i.idActivo} className="border-t hover:bg-emerald-50">
-                  <td className="p-3 font-semibold">{i.nombre_activo}</td>
-                  <td className="p-3">{i.edificio}</td>
-                  <td className="p-3">{i.aula}</td>
-
-                  <td className="p-3">
-                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full font-mono text-sm">
-                      {activo}
-                    </span>
-                  </td>
-
-                  <td className="p-3 font-mono flex items-center gap-2">
-                    {i.marbete}
-                    <button onClick={() => copiar(i.marbete)}>
-                      {copiado === i.marbete
-                        ? <CheckCircle size={16} className="text-green-600"/>
-                        : <Copy size={16}/>
-                      }
-                    </button>
-                  </td>
-
-                  <td className="p-3">
-                    <button onClick={() => abrirEditar(i)}>
-                      <Pencil size={18}/>
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* PAGINACIÓN */}
-      {totalPages > 1 && (
-        <div className="flex justify-between items-center pt-4">
-          <button
-            disabled={page === 1}
-            onClick={() => setPage(p => p - 1)}
-            className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
-          >
-            Anterior
-          </button>
-
-          <span className="font-medium">
-            Página {page} de {totalPages}
-          </span>
-
-          <button
-            disabled={page === totalPages}
-            onClick={() => setPage(p => p + 1)}
-            className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
-          >
-            Siguiente
-          </button>
-        </div>
-      )}
-
-      {/* MODAL */}
-      {modal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-xl w-[400px] space-y-4">
-
-            <div className="flex justify-between">
-              <h3 className="font-bold text-emerald-700">
-                {editando ? "Editar activo" : "Nuevo activo"}
-              </h3>
-              <button onClick={() => setModal(false)}>
-                <X />
-              </button>
-            </div>
-
-            <input
-              value={form.nombre}
-              onChange={e => setForm({ ...form, nombre: e.target.value })}
-              placeholder="Nombre del activo"
-              className="w-full border rounded-lg px-3 py-2"
-            />
-
-            <input
-              value={form.idAula}
-              onChange={e => setForm({ ...form, idAula: e.target.value })}
-              placeholder="ID Aula"
-              className="w-full border rounded-lg px-3 py-2"
-            />
-
+          <div className="flex justify-between items-center">
+            <h3 className="font-bold text-emerald-700 text-lg">
+              {editando ? "Editar activo" : "Nuevo activo"}
+            </h3>
             <button
-              onClick={guardar}
-              className="w-full bg-emerald-600 text-white py-2 rounded-lg"
+              onClick={() => setModal(false)}
+              className="text-gray-600 hover:text-red-600 transition"
             >
-              Guardar
+              <X />
             </button>
-
           </div>
-        </div>
-      )}
 
-    </div>
-  );
+          <input
+            value={form.nombre}
+            onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+            placeholder="Nombre del activo"
+            className="w-full border border-emerald-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          />
+
+          <input
+            value={form.idAula}
+            onChange={(e) => setForm({ ...form, idAula: e.target.value })}
+            placeholder="ID Aula"
+            className="w-full border border-emerald-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          />
+
+          <button
+            onClick={guardar}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium shadow-sm transition"
+          >
+            Guardar
+          </button>
+        </div>
+      </div>
+    )}
+
+  </div>
+);
 }
