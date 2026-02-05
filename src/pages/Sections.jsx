@@ -16,9 +16,7 @@ export const sections = [
   { key: "activos", label: "Grupos", icon: <Package size={20} /> },
   { key: "edificios", label: "Edificios", icon: <Building2 size={20} /> },
   { key: "bajas", label: "Bajas", icon: <Trash2 size={20} /> },
-  { key: "transferencias", label: "Transferencias", icon: <Repeat size={20} /> },
   { key: "usuarios", label: "Usuarios", icon: <Users size={20} /> },
   { key: "reportes", label: "Reportes", icon: <FileText size={20} /> },
-  { key: "solicitarBaja", label: "Solicitar Baja", icon: <FileMinus size={20} /> },
   { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> }
 ];

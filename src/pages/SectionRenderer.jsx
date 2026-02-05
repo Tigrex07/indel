@@ -3,11 +3,9 @@ import DashboardHome from "../components/Dashboardhome.jsx";
 import ActivosSection from "../components/ActivosSection.jsx";
 import ActivosGrupo from "../components/ActivosGrupo.jsx";
 import Bajas from "../components/Bajas.jsx";
-import SolicitarBaja from "./SolicitarBaja.jsx";
-import Transferencias from "./Transferencias.jsx";
 import EdificiosSection from "../components/EdificiosSection.jsx";
 import AulasSection from "../components/AulasSection.jsx";
-
+import Reportes from "../components/Reportes.jsx";
 export default function SectionRenderer({
   section,
   grupoSeleccionado,
@@ -25,11 +23,9 @@ export default function SectionRenderer({
     case "bajas":
       return <Bajas />;
 
-    case "transferencias":
-      return <Transferencias />;
+      case "reportes":
+      return <Reportes />;
 
-    case "solicitarBaja":
-      return <SolicitarBaja />;
 
     case "activos":
       return grupoSeleccionado ? (
