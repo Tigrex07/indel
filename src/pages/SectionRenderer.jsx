@@ -6,6 +6,7 @@ import Bajas from "../components/Bajas.jsx";
 import EdificiosSection from "../components/EdificiosSection.jsx";
 import AulasSection from "../components/AulasSection.jsx";
 import Reportes from "../components/Reportes.jsx";
+import SolicitarBaja from "../components/SolicitarBaja.jsx";
 export default function SectionRenderer({
   section,
   grupoSeleccionado,
@@ -25,7 +26,9 @@ export default function SectionRenderer({
 
       case "reportes":
       return <Reportes />;
-
+    
+    case "solicitar-baja":
+      return <SolicitarBaja />;
 
     case "activos":
       return grupoSeleccionado ? (
