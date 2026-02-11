@@ -1,102 +1,229 @@
-import { useState, useEffect } from "react";
-import { Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Plus, Pencil, Trash2, X, Search, Boxes } from "lucide-react";
 
-const API_URL = "https://corporacionperris.com/backend/api/grupos.php";
+const API_URL = "https://corporacionperris.com/backend/api/grupos_crud.php";
 
 export default function ActivosSection({ onOpenCategory }) {
-  const [search, setSearch] = useState("");
+
   const [grupos, setGrupos] = useState([]);
+  const [busqueda, setBusqueda] = useState("");
+  const [modal, setModal] = useState(false);
+  const [editando, setEditando] = useState(false);
+
+  const [form, setForm] = useState({
+    idGrupo: null,
+    nombre: ""
+  });
+
+  /* =========================
+     CARGAR
+  ========================= */
+  const cargar = () => {
+    fetch(API_URL, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "read" })
+    })
+      .then(res => res.json())
+      .then(json => {
+        if (json.success) setGrupos(json.data);
+      });
+  };
 
   useEffect(() => {
-    fetch(API_URL, { credentials: "include" })
-      .then(r => r.json())
-      .then(j => j.success && setGrupos(j.data));
+    cargar();
   }, []);
 
-  const filtered = grupos.filter(g =>
-    g.nombre.toLowerCase().includes(search.toLowerCase()) ||
-    g.clave.includes(search)
+  /* =========================
+     FILTRO
+  ========================= */
+  const filtrados = grupos.filter(g =>
+    g.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+    g.clave.toString().includes(busqueda)
   );
 
+  /* =========================
+     CREAR / EDITAR
+  ========================= */
+  const abrirNuevo = () => {
+    setEditando(false);
+    setForm({ idGrupo: null, nombre: "" });
+    setModal(true);
+  };
+
+  const abrirEditar = (grupo) => {
+    setEditando(true);
+    setForm({
+      idGrupo: grupo.idGrupo,
+      nombre: grupo.nombre
+    });
+    setModal(true);
+  };
+
+  const guardar = () => {
+    if (!form.nombre.trim()) {
+      alert("El nombre es obligatorio");
+      return;
+    }
+
+    fetch(API_URL, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: editando ? "update" : "create",
+        idGrupo: form.idGrupo,
+        nombre: form.nombre
+      })
+    })
+      .then(res => res.json())
+      .then(json => {
+        if (json.success) {
+          setModal(false);
+          cargar();
+        }
+      });
+  };
+
+  const eliminar = (idGrupo) => {
+    if (!confirm("¿Eliminar grupo?")) return;
+
+    fetch(API_URL, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "delete",
+        idGrupo
+      })
+    })
+      .then(res => res.json())
+      .then(json => {
+        if (json.success) cargar();
+      });
+  };
+
   return (
-  <div className="space-y-8">
+    <div className="space-y-8">
 
-    {/* TÍTULO */}
-    <div className="flex items-center gap-3">
-      <Search size={26} className="text-emerald-700 opacity-70" />
-      <h2 className="text-3xl font-bold text-emerald-700 tracking-tight">
-        Grupos de Activos
-      </h2>
-    </div>
+      {/* HEADER */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-emerald-600">
+          Grupos
+        </h2>
 
-    {/* BUSCADOR */}
-    <div className="relative max-w-md">
-      <Search
-        size={18}
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600"
-      />
-      <input
-        className="w-full pl-10 pr-3 py-2.5 border border-emerald-200 rounded-lg
-                   focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all"
-        placeholder="Buscar grupos..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-    </div>
-
-    {/* GRID DE GRUPOS */}
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-      {filtered.map((g) => (
         <button
-          key={g.idGrupo}
-          onClick={() => onOpenCategory(g.clave, g.nombre, g.idGrupo)}
-          className="bg-white border border-emerald-200 rounded-xl p-5 shadow-sm
-                     hover:shadow-md hover:bg-emerald-50 hover:scale-[1.02]
-                     active:scale-[0.98] transition-all text-left flex flex-col gap-2"
+          onClick={abrirNuevo}
+          className="bg-emerald-600 text-white px-5 py-2 rounded-xl flex items-center gap-2 hover:bg-emerald-700 transition shadow"
         >
-          <div className="flex items-center gap-2 text-emerald-700">
-            {/* Icono del grupo */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5 opacity-80"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 7l9-4 9 4-9 4-9-4z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 17l9 4 9-4"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 12l9 4 9-4"
-              />
-            </svg>
-
-            <span className="font-semibold text-sm">{g.clave}</span>
-          </div>
-
-          <p className="text-gray-800 font-bold text-lg leading-tight">
-            {g.nombre}
-          </p>
+          <Plus size={18} />
+          Nuevo
         </button>
-      ))}
+      </div>
 
-      {filtered.length === 0 && (
-        <p className="col-span-full text-center text-gray-500">
-          No se encontraron grupos
-        </p>
+      {/* BUSCADOR */}
+      <div className="relative max-w-xl">
+        <Search
+          size={18}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600"
+        />
+        <input
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          placeholder="Buscar grupo..."
+          className="w-full pl-11 pr-4 py-3 rounded-xl border border-emerald-200 bg-emerald-50 focus:bg-white focus:ring-2 focus:ring-emerald-400 outline-none transition"
+        />
+      </div>
+
+      {/* GRID */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+
+        {filtrados.map(grupo => (
+          <div
+            key={grupo.idGrupo}
+            className="group relative bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:bg-emerald-50 hover:border-emerald-400 transition-all duration-300 cursor-pointer"
+            onClick={() => onOpenCategory(grupo.clave)}
+          >
+
+            {/* ICONO */}
+            <div className="flex items-center gap-2 text-emerald-600 mb-3">
+              <Boxes size={20} />
+              <span className="text-sm font-semibold">
+                {grupo.clave}
+              </span>
+            </div>
+
+            <p className="text-lg font-bold text-gray-800 leading-tight">
+              {grupo.nombre}
+            </p>
+
+            {/* BOTONES HOVER */}
+            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition flex gap-2">
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  abrirEditar(grupo);
+                }}
+                className="bg-white p-2 rounded-lg shadow hover:bg-emerald-100 transition"
+              >
+                <Pencil size={16} className="text-emerald-700" />
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  eliminar(grupo.idGrupo);
+                }}
+                className="bg-white p-2 rounded-lg shadow hover:bg-red-100 transition"
+              >
+                <Trash2 size={16} className="text-red-600" />
+              </button>
+
+            </div>
+
+          </div>
+        ))}
+
+      </div>
+
+      {/* MODAL */}
+      {modal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+
+          <div className="bg-white p-8 rounded-2xl w-[400px] space-y-5 shadow-2xl">
+
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold text-emerald-700">
+                {editando ? "Editar grupo" : "Nuevo grupo"}
+              </h3>
+
+              <button onClick={() => setModal(false)}>
+                <X />
+              </button>
+            </div>
+
+            <input
+              value={form.nombre}
+              onChange={(e) =>
+                setForm({ ...form, nombre: e.target.value })
+              }
+              placeholder="Nombre del grupo"
+              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 outline-none transition"
+            />
+
+            <button
+              onClick={guardar}
+              className="w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold hover:bg-emerald-700 transition shadow"
+            >
+              Guardar
+            </button>
+
+          </div>
+        </div>
       )}
-    </div>
 
-  </div>
-);
+    </div>
+  );
 }
