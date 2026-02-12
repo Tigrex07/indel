@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { History, Search, ArrowRight, Calendar, User } from "lucide-react";
 
-const API_REPORTES = "https://corporacionperris.com/backend/api/reportes.php";
-
 export default function Reportes() {
   const [eventos, setEventos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
@@ -10,10 +8,43 @@ export default function Reportes() {
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
 
+  // 🔹 Cargar mocks en vez de API
   useEffect(() => {
-    fetch(API_REPORTES, { credentials: "include" })
-      .then(r => r.json())
-      .then(j => j.success && setEventos(j.data));
+    const mockEventos = [
+      {
+        id: 1,
+        fecha: "2026-02-10",
+        hora: "09:15",
+        descripcion: "Asignación de equipo de cómputo",
+        detalles: "Se asignó laptop Dell a Juan Pérez",
+        usuario: "Admin"
+      },
+      {
+        id: 2,
+        fecha: "2026-02-11",
+        hora: "14:30",
+        descripcion: "Retiro de proyector",
+        detalles: "Proyector Epson retirado por mantenimiento",
+        usuario: "María López"
+      },
+      {
+        id: 3,
+        fecha: "2026-02-12",
+        hora: "08:00",
+        descripcion: "Préstamo de impresora",
+        detalles: "Impresora HP prestada al área de Finanzas",
+        usuario: "Carlos Ruiz"
+      },
+      {
+        id: 4,
+        fecha: "2026-02-12",
+        hora: "10:45",
+        descripcion: "Movimiento de mobiliario",
+        detalles: "Se movieron 10 pupitres al edificio B",
+        usuario: "Admin"
+      }
+    ];
+    setEventos(mockEventos);
   }, []);
 
   /* ============================
@@ -23,20 +54,17 @@ export default function Reportes() {
     return eventos.filter(ev => {
       const fechaEv = new Date(ev.fecha);
 
-      // FILTRO: FECHA INICIO
       if (fechaInicio) {
         const inicio = new Date(fechaInicio);
         if (fechaEv < inicio) return false;
       }
 
-      // FILTRO: FECHA FIN
       if (fechaFin) {
         const fin = new Date(fechaFin);
         fin.setHours(23, 59, 59);
         if (fechaEv > fin) return false;
       }
 
-      // FILTRO: BUSQUEDA
       return ev.descripcion.toLowerCase().includes(busqueda.toLowerCase());
     });
   };
@@ -71,8 +99,6 @@ export default function Reportes() {
 
       {/* FILTROS */}
       <div className="flex flex-wrap gap-6 items-end">
-
-        {/* Fecha inicio */}
         <div className="flex flex-col">
           <label className="text-sm font-medium text-gray-700">Desde</label>
           <input
@@ -83,7 +109,6 @@ export default function Reportes() {
           />
         </div>
 
-        {/* Fecha fin */}
         <div className="flex flex-col">
           <label className="text-sm font-medium text-gray-700">Hasta</label>
           <input
@@ -94,7 +119,6 @@ export default function Reportes() {
           />
         </div>
 
-        {/* Buscador */}
         <div className="relative">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600"
@@ -113,29 +137,23 @@ export default function Reportes() {
       <div className="space-y-10">
         {Object.keys(gruposPorDia).map((dia) => (
           <div key={dia} className="space-y-4">
-
-            {/* FECHA */}
             <div className="flex items-center gap-2 text-emerald-700 font-semibold">
               <Calendar size={18} />
               <span>{dia}</span>
             </div>
 
-            {/* EVENTOS DEL DÍA */}
             {gruposPorDia[dia].map((ev) => (
               <div
                 key={ev.id}
                 className="bg-white border border-emerald-200 rounded-xl p-5 shadow-sm hover:shadow-md transition"
               >
                 <div className="flex justify-between items-start">
-
-                  {/* DESCRIPCIÓN */}
                   <div className="flex items-start gap-3">
                     <ArrowRight className="text-emerald-600 mt-1" />
                     <div>
                       <p className="font-semibold text-gray-800">
                         {ev.descripcion}
                       </p>
-
                       {ev.detalles && (
                         <p className="text-gray-600 text-sm mt-1">
                           {ev.detalles}
@@ -144,7 +162,6 @@ export default function Reportes() {
                     </div>
                   </div>
 
-                  {/* USUARIO Y HORA */}
                   <div className="text-right text-gray-500 text-sm flex flex-col items-end gap-1">
                     <div className="flex items-center gap-1">
                       <User size={14} />
@@ -152,15 +169,12 @@ export default function Reportes() {
                     </div>
                     <span>{ev.hora}</span>
                   </div>
-
                 </div>
               </div>
             ))}
-
           </div>
         ))}
 
-        {/* ESTADO VACÍO BONITO */}
         {eventosFiltrados.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 opacity-70">
             <History size={60} className="text-emerald-600 mb-4" />
@@ -173,7 +187,6 @@ export default function Reportes() {
           </div>
         )}
       </div>
-
     </div>
   );
 }
