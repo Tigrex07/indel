@@ -1,153 +1,254 @@
 import { useState, useEffect } from "react";
-import { FileText, Search } from "lucide-react";
+import { FileText, Search, Plus, Trash2 } from "lucide-react";
 
 const API_INVENTARIO = "https://corporacionperris.com/backend/api/inventario.php";
 
-export default function SolicitarBaja() {
-  const [tipo, setTipo] = useState("baja");
+export default function SolicitudForm() {
 
-  const [form, setForm] = useState({
-    idActivo: "",      // ahora será marbete
-    descripcion: "",
-    area: "",
-    responsable: "",
-    motivo: "",
-    fecha: ""
-  });
+  /* =========================
+     TIPOS (ALINEADO CON BD)
+     1 = Asignación
+     2 = Retiro
+     3 = Movimiento
+     4 = Préstamo
+  ========================= */
+  const TIPOS = [
+    { id: 1, nombre: "Asignación" },
+    { id: 2, nombre: "Retiro" },
+    { id: 3, nombre: "Movimiento" },
+    { id: 4, nombre: "Préstamo" }
+  ];
 
+  const [tipo, setTipo] = useState(1);
   const [inventario, setInventario] = useState([]);
 
+  const [form, setForm] = useState({
+    fecha_requerida: "",
+    justificacion: ""
+  });
+
+  const [detalles, setDetalles] = useState([
+    {
+      marbete: "",
+      id_inventario: "",
+      descripcion: "",
+      area: "",
+      cantidad_solicitada: 1,
+      numeros_marbetes: "",
+      ubicacion_destino: ""
+    }
+  ]);
+
+  /* =========================
+     CARGAR INVENTARIO
+  ========================= */
   useEffect(() => {
     fetch(API_INVENTARIO, { credentials: "include" })
       .then(r => r.json())
-      .then(j => j.success && setInventario(j.data));
+      .then(j => {
+        if (j.success) setInventario(j.data);
+      })
+      .catch(err => console.error(err));
   }, []);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  /* =========================
+     MANEJO DETALLES
+  ========================= */
+  const handleDetalleChange = (index, e) => {
+    const nuevos = [...detalles];
+    nuevos[index][e.target.name] = e.target.value;
 
-    if (e.target.name === "idActivo") {
-      const marbete = e.target.value;
-      const encontrado = inventario.find(i => i.marbete === marbete);
-
+    if (e.target.name === "marbete") {
+      const encontrado = inventario.find(i => i.marbete === e.target.value);
       if (encontrado) {
-        setForm(prev => ({
-          ...prev,
-          descripcion: encontrado.nombre_activo,
-          area: `${encontrado.edificio} / ${encontrado.aula}`
-        }));
+        nuevos[index].id_inventario = encontrado.idInventario;
+        nuevos[index].descripcion = encontrado.nombre_activo;
+        nuevos[index].area = `${encontrado.edificio} / ${encontrado.aula}`;
       }
     }
+
+    setDetalles(nuevos);
   };
 
+  const agregarActivo = () => {
+    setDetalles([
+      ...detalles,
+      {
+        marbete: "",
+        id_inventario: "",
+        descripcion: "",
+        area: "",
+        cantidad_solicitada: 1,
+        numeros_marbetes: "",
+        ubicacion_destino: ""
+      }
+    ]);
+  };
+
+  const eliminarActivo = (index) => {
+    setDetalles(detalles.filter((_, i) => i !== index));
+  };
+
+  /* =========================
+     SUBMIT
+  ========================= */
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!form.idActivo || !form.responsable || !form.motivo) {
-      alert("Completa los campos obligatorios");
-      return;
-    }
+    const payload = {
+      id_tipo: tipo,
+      fecha_requerida: form.fecha_requerida,
+      justificacion: form.justificacion,
+      detalles: detalles.map(d => ({
+        id_inventario: d.id_inventario,
+        cantidad_solicitada: d.cantidad_solicitada,
+        numeros_marbetes: d.numeros_marbetes,
+        ubicacion_destino: d.ubicacion_destino
+      }))
+    };
 
-    console.log("Solicitud enviada:", { tipo, ...form });
-    alert("✅ Solicitud enviada correctamente");
+    console.log("Solicitud lista:", payload);
+    alert("Solicitud preparada correctamente");
   };
 
   return (
     <div className="min-h-screen bg-emerald-50 flex justify-center items-start p-10">
       <form
         onSubmit={handleSubmit}
-        className="bg-white w-full max-w-3xl p-8 rounded-xl shadow-lg border"
+        className="bg-white w-full max-w-4xl p-8 rounded-xl shadow-lg border space-y-6"
       >
 
         {/* ENCABEZADO */}
-        <div className="text-center mb-6">
+        <div className="text-center">
           <h1 className="text-2xl font-extrabold text-emerald-700">
-            FORMATO DE MOVIMIENTO DE ACTIVO
+            FORMATO DE SOLICITUD
           </h1>
-          <p className="text-sm text-gray-500">Inventario Escolar</p>
+          <p className="text-sm text-gray-500">Sistema de Inventario</p>
         </div>
 
-        {/* TIPO DE MOVIMIENTO */}
+        {/* TIPO DE MOVIMIENTO (DISEÑO ORIGINAL RESTAURADO) */}
         <div className="mb-6">
-          <label className="block font-semibold mb-2">Tipo de movimiento</label>
-          <div className="flex gap-4">
-            {["baja", "solicitud", "prestamo"].map(t => (
+          <label className="block font-semibold mb-2">
+            Tipo de movimiento
+          </label>
+
+          <div className="flex gap-4 flex-wrap">
+            {TIPOS.map(t => (
               <label
-                key={t}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer
-                  ${tipo === t ? "bg-emerald-600 text-white" : "bg-gray-100"}`}
+                key={t.id}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer transition
+                  ${tipo === t.id
+                    ? "bg-emerald-600 text-white border-emerald-600"
+                    : "bg-gray-100 hover:bg-gray-200"
+                  }`}
               >
                 <input
                   type="radio"
-                  value={t}
-                  checked={tipo === t}
-                  onChange={() => setTipo(t)}
+                  value={t.id}
+                  checked={tipo === t.id}
+                  onChange={() => setTipo(t.id)}
                   className="hidden"
                 />
-                {t.toUpperCase()}
+                {t.nombre.toUpperCase()}
               </label>
             ))}
           </div>
         </div>
 
-        {/* DATOS DEL ACTIVO */}
-        <Section title="Datos del Activo">
-          <Input
-            label="Marbete"
-            name="idActivo"
-            value={form.idActivo}
-            onChange={handleChange}
-            placeholder="Ej. A-1023"
-            icon={<Search size={16} className="text-emerald-600" />}
-            required
-          />
+        {/* ACTIVOS */}
+        {detalles.map((detalle, index) => (
+          <div key={index} className="border rounded-xl p-4 space-y-4 relative">
 
-          <Input
-            label="Descripción"
-            name="descripcion"
-            value={form.descripcion}
-            onChange={handleChange}
-            readOnly
-          />
+            {detalles.length > 1 && (
+              <button
+                type="button"
+                onClick={() => eliminarActivo(index)}
+                className="absolute top-3 right-3 text-red-500"
+              >
+                <Trash2 size={18} />
+              </button>
+            )}
 
-          <Input
-            label="Área / Aula"
-            name="area"
-            value={form.area}
-            onChange={handleChange}
-            readOnly
-          />
-        </Section>
+            <div className="grid grid-cols-2 gap-4">
 
-        {/* DATOS DEL RESPONSABLE */}
-        <Section title="Datos del Responsable">
-          <Input
-            label="Nombre del Responsable"
-            name="responsable"
-            value={form.responsable}
-            onChange={handleChange}
-            required
-          />
+              <Input
+                label="Marbete"
+                name="marbete"
+                value={detalle.marbete}
+                onChange={(e) => handleDetalleChange(index, e)}
+                icon={<Search size={16} />}
+              />
 
-          <Input
-            label="Fecha"
-            name="fecha"
-            type="date"
-            value={form.fecha}
-            onChange={handleChange}
-          />
-        </Section>
+              <Input
+                label="Descripción"
+                value={detalle.descripcion}
+                readOnly
+              />
 
-        {/* MOTIVO */}
-        <div className="mb-6">
-          <label className="block font-semibold mb-2">Motivo del movimiento</label>
+              <Input
+                label="Área actual"
+                value={detalle.area}
+                readOnly
+              />
+
+              <Input
+                label="Cantidad solicitada"
+                name="cantidad_solicitada"
+                type="number"
+                min="1"
+                value={detalle.cantidad_solicitada}
+                onChange={(e) => handleDetalleChange(index, e)}
+              />
+
+              <Input
+                label="Ubicación destino"
+                name="ubicacion_destino"
+                value={detalle.ubicacion_destino}
+                onChange={(e) => handleDetalleChange(index, e)}
+              />
+
+              <Input
+                label="Números de marbetes"
+                name="numeros_marbetes"
+                value={detalle.numeros_marbetes}
+                onChange={(e) => handleDetalleChange(index, e)}
+              />
+
+            </div>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={agregarActivo}
+          className="flex items-center gap-2 text-emerald-700 font-semibold"
+        >
+          <Plus size={16} />
+          Agregar otro activo
+        </button>
+
+        {/* FECHA REQUERIDA */}
+        <Input
+          label="Fecha requerida"
+          type="date"
+          value={form.fecha_requerida}
+          onChange={(e) =>
+            setForm({ ...form, fecha_requerida: e.target.value })
+          }
+        />
+
+        {/* JUSTIFICACIÓN */}
+        <div>
+          <label className="block font-semibold mb-2">
+            Justificación
+          </label>
           <textarea
-            name="motivo"
-            value={form.motivo}
-            onChange={handleChange}
             rows="4"
+            value={form.justificacion}
+            onChange={(e) =>
+              setForm({ ...form, justificacion: e.target.value })
+            }
             className="w-full border rounded-lg px-3 py-2"
-            placeholder="Describe el motivo..."
           />
         </div>
 
@@ -159,30 +260,25 @@ export default function SolicitarBaja() {
           <FileText size={18} />
           Enviar Solicitud
         </button>
+
       </form>
     </div>
   );
 }
 
-/* COMPONENTES AUXILIARES */
-
-function Section({ title, children }) {
-  return (
-    <div className="mb-6">
-      <h2 className="font-bold text-emerald-700 mb-3 border-b pb-1">{title}</h2>
-      <div className="grid grid-cols-2 gap-4">{children}</div>
-    </div>
-  );
-}
-
+/* =========================
+   COMPONENTE INPUT
+========================= */
 function Input({ label, icon, ...props }) {
   return (
     <div>
       <label className="block text-sm font-semibold mb-1">{label}</label>
-
       <div className="relative">
-        {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2">{icon}</div>}
-
+        {icon && (
+          <div className="absolute left-3 top-1/2 -translate-y-1/2">
+            {icon}
+          </div>
+        )}
         <input
           {...props}
           className={`w-full border rounded-lg px-3 py-2 ${
