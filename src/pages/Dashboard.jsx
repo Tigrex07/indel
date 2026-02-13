@@ -9,6 +9,9 @@ export default function Dashboard({ onLogout }) {
   const [grupoSeleccionado, setGrupoSeleccionado] = useState(null);
   const [edificioSeleccionado, setEdificioSeleccionado] = useState(null);
 
+  const [aulaSeleccionada, setAulaSeleccionada] = useState(null);
+
+
   useEffect(() => {
     fetch("https://corporacionperris.com/backend/api/me.php", {
       credentials: "include",
@@ -34,25 +37,27 @@ export default function Dashboard({ onLogout }) {
       <main className="flex-1 p-10 space-y-10">
 
         <SectionRenderer
-          section={activeSection}
-          grupoSeleccionado={grupoSeleccionado}
-          edificioSeleccionado={edificioSeleccionado}
-          setEdificioSeleccionado={setEdificioSeleccionado}
+              section={activeSection}
+              grupoSeleccionado={grupoSeleccionado}
+              edificioSeleccionado={edificioSeleccionado}
+              setEdificioSeleccionado={(edificio) => {
+                setEdificioSeleccionado(edificio);
+                setAulaSeleccionada(null); // 🔥 reset si cambias edificio
+              }}
+              aulaSeleccionada={aulaSeleccionada}
+              setAulaSeleccionada={setAulaSeleccionada}
 
-          // 🔥 ESTA ES LA FUNCIÓN CORRECTA
-          onOpenCategory={(clave, nombre, id) => {
+              onOpenCategory={(clave, nombre, id) => {
 
-            // ← SI ES VOLVER
-            if (clave === null) {
-              setGrupoSeleccionado(null);
-              return; // NO CAMBIAMOS DE SECCIÓN
-            }
+                if (clave === null) {
+                  setGrupoSeleccionado(null);
+                  return;
+                }
 
-            // ← SI ES SELECCIONAR GRUPO
-            setGrupoSeleccionado({ clave, nombre, id });
-            setActiveSection("activos");
-          }}
-        />
+                setGrupoSeleccionado({ clave, nombre, id });
+                setActiveSection("activos");
+              }}
+            />
 
       </main>
     </div>
