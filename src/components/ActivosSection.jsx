@@ -1,128 +1,230 @@
-import { useEffect, useState, useMemo } from "react";
-import { Search, Package } from "lucide-react";
 
-const API_URL = "https://corporacionperris.com/backend/api/inventario.php";
+import { useEffect, useState } from "react";
+import { Plus, Pencil, Trash2, X, Search, Boxes } from "lucide-react";
 
-export default function ActivosAula({
-  idAula,
-  nombreAula,
-  claveAula,
-  onBack
-}) {
-  const [activos, setActivos] = useState([]);
-  const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
+const API_URL = "https://corporacionperris.com/backend/api/grupos_crud.php";
 
-  useEffect(() => {
-    if (!idAula) return;
+export default function ActivosSection({ onOpenCategory }) {
 
-    setLoading(true);
+  const [grupos, setGrupos] = useState([]);
+  const [busqueda, setBusqueda] = useState("");
+  const [modal, setModal] = useState(false);
+  const [editando, setEditando] = useState(false);
 
-    fetch(`${API_URL}?aula=${idAula}`, {
-      credentials: "include"
+  const [form, setForm] = useState({
+    idGrupo: null,
+    nombre: ""
+  });
+
+  /* =========================
+     CARGAR
+  ========================= */
+  const cargar = () => {
+    fetch(API_URL, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "read" })
     })
       .then(res => res.json())
       .then(json => {
-        if (json.success) setActivos(json.data);
+        if (json.success) setGrupos(json.data);
+      });
+  };
+
+  useEffect(() => {
+    cargar();
+  }, []);
+
+  /* =========================
+     FILTRO
+  ========================= */
+  const filtrados = grupos.filter(g =>
+    g.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+    g.clave.toString().includes(busqueda)
+  );
+
+  /* =========================
+     CREAR / EDITAR
+  ========================= */
+  const abrirNuevo = () => {
+    setEditando(false);
+    setForm({ idGrupo: null, nombre: "" });
+    setModal(true);
+  };
+
+  const abrirEditar = (grupo) => {
+    setEditando(true);
+    setForm({
+      idGrupo: grupo.idGrupo,
+      nombre: grupo.nombre
+    });
+    setModal(true);
+  };
+
+  const guardar = () => {
+    if (!form.nombre.trim()) {
+      alert("El nombre es obligatorio");
+      return;
+    }
+
+    fetch(API_URL, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: editando ? "update" : "create",
+        idGrupo: form.idGrupo,
+        nombre: form.nombre
       })
-      .finally(() => setLoading(false));
+    })
+      .then(res => res.json())
+      .then(json => {
+        if (json.success) {
+          setModal(false);
+          cargar();
+        }
+      });
+  };
 
-  }, [idAula]);
+  const eliminar = (idGrupo) => {
+    if (!confirm("¿Eliminar grupo?")) return;
 
-  const filtered = useMemo(() => {
-    return activos.filter(a =>
-      a.nombre.toLowerCase().includes(search.toLowerCase()) ||
-      a.clave.toString().includes(search)
-    );
-  }, [activos, search]);
+    fetch(API_URL, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "delete",
+        idGrupo
+      })
+    })
+      .then(res => res.json())
+      .then(json => {
+        if (json.success) cargar();
+      });
+  };
 
   return (
-    <div className="bg-white rounded-xl shadow-xl p-8 border border-emerald-200 space-y-8">
+    <div className="space-y-8">
 
+      {/* HEADER */}
       <div className="flex justify-between items-center">
-        <button
-          onClick={onBack}
-          className="text-emerald-600 font-semibold hover:underline"
-        >
-          ← Volver a aulas
-        </button>
-
-        <h2 className="text-2xl font-bold text-emerald-700">
-          Activos — {nombreAula}
-          <span className="ml-2 text-sm text-emerald-500">
-            ({claveAula})
-          </span>
+        <h2 className="text-2xl font-bold text-emerald-600">
+          Grupos
         </h2>
+
+        <button
+          onClick={abrirNuevo}
+          className="bg-emerald-600 text-white px-5 py-2 rounded-xl flex items-center gap-2 hover:bg-emerald-700 transition shadow"
+        >
+          <Plus size={18} />
+          Nuevo
+        </button>
       </div>
 
-      <div className="flex items-center bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-2">
-        <Search size={18} className="text-emerald-600" />
+      {/* BUSCADOR */}
+      <div className="relative max-w-xl">
+        <Search
+          size={18}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600"
+        />
         <input
-          type="text"
-          placeholder="Buscar activo..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="bg-transparent flex-1 ml-2 focus:outline-none"
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          placeholder="Buscar grupo..."
+          className="w-full pl-11 pr-4 py-3 rounded-xl border border-emerald-200 bg-emerald-50 focus:bg-white focus:ring-2 focus:ring-emerald-400 outline-none transition"
         />
       </div>
 
-      {loading && (
-        <p className="text-center text-gray-500">
-          Cargando activos...
-        </p>
-      )}
+      {/* GRID */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
 
-      {!loading && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left border rounded-lg overflow-hidden">
-            <thead className="bg-emerald-600 text-white">
-              <tr>
-                <th className="px-4 py-3">Clave</th>
-                <th className="px-4 py-3">Nombre</th>
-                <th className="px-4 py-3">Fecha</th>
-                <th className="px-4 py-3">Importe</th>
-                <th className="px-4 py-3">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((activo) => (
-                <tr
-                  key={activo.idActivo}
-                  className="border-b hover:bg-emerald-50 transition"
-                >
-                  <td className="px-4 py-3 font-semibold">
-                    {activo.clave}
-                  </td>
-                  <td className="px-4 py-3">
-                    {activo.nombre}
-                  </td>
-                  <td className="px-4 py-3">
-                    {activo.fecha}
-                  </td>
-                  <td className="px-4 py-3">
-                    ${activo.importe}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded-full text-xs
-                      ${activo.actividad == 1
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                      }`}>
-                      {activo.actividad == 1 ? "Activo" : "Inactivo"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {filtrados.map(grupo => (
+          <div
+            key={grupo.idGrupo}
+            className="group relative bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:bg-emerald-50 hover:border-emerald-400 transition-all duration-300 cursor-pointer"
+            onClick={() => onOpenCategory(grupo.clave)}
+          >
 
-          {filtered.length === 0 && (
-            <p className="text-center text-gray-500 mt-4">
-              No hay activos en esta aula
+            {/* ICONO */}
+            <div className="flex items-center gap-2 text-emerald-600 mb-3">
+              <Boxes size={20} />
+              <span className="text-sm font-semibold">
+                {grupo.clave}
+              </span>
+            </div>
+
+            <p className="text-lg font-bold text-gray-800 leading-tight">
+              {grupo.nombre}
             </p>
-          )}
+
+            {/* BOTONES HOVER */}
+            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition flex gap-2">
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  abrirEditar(grupo);
+                }}
+                className="bg-white p-2 rounded-lg shadow hover:bg-emerald-100 transition"
+              >
+                <Pencil size={16} className="text-emerald-700" />
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  eliminar(grupo.idGrupo);
+                }}
+                className="bg-white p-2 rounded-lg shadow hover:bg-red-100 transition"
+              >
+                <Trash2 size={16} className="text-red-600" />
+              </button>
+
+            </div>
+
+          </div>
+        ))}
+
+      </div>
+
+      {/* MODAL */}
+      {modal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+
+          <div className="bg-white p-8 rounded-2xl w-[400px] space-y-5 shadow-2xl">
+
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold text-emerald-700">
+                {editando ? "Editar grupo" : "Nuevo grupo"}
+              </h3>
+
+              <button onClick={() => setModal(false)}>
+                <X />
+              </button>
+            </div>
+
+            <input
+              value={form.nombre}
+              onChange={(e) =>
+                setForm({ ...form, nombre: e.target.value })
+              }
+              placeholder="Nombre del grupo"
+              className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 outline-none transition"
+            />
+
+            <button
+              onClick={guardar}
+              className="w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold hover:bg-emerald-700 transition shadow"
+            >
+              Guardar
+            </button>
+
+          </div>
         </div>
       )}
+
     </div>
   );
 }
