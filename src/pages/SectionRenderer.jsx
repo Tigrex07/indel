@@ -5,6 +5,7 @@ import ActivosGrupo from "../components/ActivosGrupo.jsx";
 import Bajas from "../components/Bajas.jsx";
 import EdificiosSection from "../components/EdificiosSection.jsx";
 import AulasSection from "../components/AulasSection.jsx";
+import ActivosAula from "../components/ActivosAula.jsx"
 import Reportes from "../components/Reportes.jsx";
 import SolicitarBaja from "../components/SolicitarBaja.jsx";
 export default function SectionRenderer({
@@ -12,8 +13,13 @@ export default function SectionRenderer({
   grupoSeleccionado,
   onOpenCategory,
   edificioSeleccionado,
-  setEdificioSeleccionado
+  setEdificioSeleccionado,
+  aulaSeleccionada,
+  setAulaSeleccionada
 }) {
+
+
+
   switch (section) {
     case "dashboard":
       return <DashboardHome />;
@@ -42,17 +48,37 @@ export default function SectionRenderer({
         <ActivosSection onOpenCategory={onOpenCategory} />
       );
 
-    case "edificios":
-      return edificioSeleccionado ? (
-        <AulasSection
-          idEdificio={edificioSeleccionado.id}
-          nombreEdificio={edificioSeleccionado.nombre}
-          claveEdificio={edificioSeleccionado.clave}
-          onBack={() => setEdificioSeleccionado(null)}
-        />
-      ) : (
-        <EdificiosSection onSelectEdificio={setEdificioSeleccionado} />
-      );
+case "edificios":
+
+  if (!edificioSeleccionado) {
+    return (
+      <EdificiosSection
+        onSelectEdificio={setEdificioSeleccionado}
+      />
+    );
+  }
+
+  if (!aulaSeleccionada) {
+    return (
+      <AulasSection
+        idEdificio={edificioSeleccionado.idEdificio}
+        nombreEdificio={edificioSeleccionado.nombre}
+        claveEdificio={edificioSeleccionado.clave}
+        actividadEdificio={edificioSeleccionado.actividad}
+        onBack={() => setEdificioSeleccionado(null)}
+        onSelectAula={setAulaSeleccionada}
+      />
+    );
+  }
+
+  return (
+    <ActivosAula
+      idAula={aulaSeleccionada.idAula}
+      nombreAula={aulaSeleccionada.nombre}
+      claveAula={aulaSeleccionada.clave}
+      onBack={() => setAulaSeleccionada(null)}
+    />
+  );
 
     default:
       return (
