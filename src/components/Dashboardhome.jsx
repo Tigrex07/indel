@@ -31,24 +31,28 @@ export default function DashboardHome() {
       .catch(() => setLoading(false));
   }, []);
 
+  /* =========================
+     KPIs (solo activos activos)
+  ========================= */
+  const activosActivos = data.filter(i => i.actividad === 1);
 
-  const totalActivos = data.length;
-  const totalEdificios = new Set(data.map((i) => i.edificio)).size;
-  const totalGrupos = new Set(data.map((i) => i.grupo)).size;
+  const totalActivos = activosActivos.length;
+  const totalEdificios = new Set(activosActivos.map((i) => i.edificio)).size;
+  const totalGrupos = new Set(activosActivos.map((i) => i.grupo)).size;
 
   /* =========================
-     FILTRO (CORRECTO)
+     FILTRO
   ========================= */
-  const filtrado = data.filter((item) => {
+  const filtrado = activosActivos.filter((item) => {
     const q = query.toLowerCase();
 
     return (
       (q === "" ||
-        item.nombre_activo.toLowerCase().includes(q) ||
-        item.aula.toLowerCase().includes(q) ||
-        item.edificio.toLowerCase().includes(q) ||
-        item.grupo.toLowerCase().includes(q) ||
-        item.marbete.includes(query)) &&
+        (item.nombre || "").toLowerCase().includes(q) ||
+        (item.aula || "").toLowerCase().includes(q) ||
+        (item.edificio || "").toLowerCase().includes(q) ||
+        (item.grupo || "").toLowerCase().includes(q) ||
+        (item.marbete || "").includes(query)) &&
       (edificio === "Todos" || item.edificio === edificio) &&
       (grupo === "Todos" || item.grupo === grupo)
     );
@@ -57,7 +61,7 @@ export default function DashboardHome() {
   /* =========================
      PAGINACIÓN
   ========================= */
-  const totalPages = Math.ceil(filtrado.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filtrado.length / ITEMS_PER_PAGE) || 1;
   const inicio = (page - 1) * ITEMS_PER_PAGE;
   const paginaData = filtrado.slice(inicio, inicio + ITEMS_PER_PAGE);
 
@@ -100,14 +104,10 @@ export default function DashboardHome() {
       <div className="bg-white border border-emerald-200 rounded-xl p-6 shadow">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
-          {/* BUSCAR */}
           <div>
             <label className="font-medium text-gray-700">Buscar:</label>
             <div className="relative">
-              <Search
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600"
-              />
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -117,7 +117,6 @@ export default function DashboardHome() {
             </div>
           </div>
 
-          {/* EDIFICIO */}
           <div>
             <label className="font-medium text-gray-700">Edificio:</label>
             <div className="relative">
@@ -127,18 +126,14 @@ export default function DashboardHome() {
                 className="appearance-none w-full border rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-emerald-500"
               >
                 <option>Todos</option>
-                {[...new Set(data.map((i) => i.edificio))].map((e) => (
+                {[...new Set(activosActivos.map((i) => i.edificio))].map((e) => (
                   <option key={e}>{e}</option>
                 ))}
               </select>
-              <ChevronDown
-                size={18}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
-              />
+              <ChevronDown size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600" />
             </div>
           </div>
 
-          {/* GRUPO */}
           <div>
             <label className="font-medium text-gray-700">Grupo:</label>
             <div className="relative">
@@ -148,18 +143,14 @@ export default function DashboardHome() {
                 className="appearance-none w-full border rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-emerald-500"
               >
                 <option>Todos</option>
-                {[...new Set(data.map((i) => i.grupo))].map((g) => (
+                {[...new Set(activosActivos.map((i) => i.grupo))].map((g) => (
                   <option key={g}>{g}</option>
                 ))}
               </select>
-              <ChevronDown
-                size={18}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
-              />
+              <ChevronDown size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600" />
             </div>
           </div>
 
-          {/* LIMPIAR */}
           <div className="flex justify-end">
             <button
               onClick={limpiar}
@@ -180,7 +171,7 @@ export default function DashboardHome() {
               <th className="px-4 py-3">Edificio</th>
               <th className="px-4 py-3">Aula</th>
               <th className="px-4 py-3">Grupo</th>
-              <th className="px-4 py-3">Activo</th>
+              <th className="px-4 py-3">Clave</th>
               <th className="px-4 py-3">Marbete</th>
             </tr>
           </thead>
@@ -188,20 +179,18 @@ export default function DashboardHome() {
           <tbody>
             {paginaData.length ? (
               paginaData.map((i) => (
-                <tr key={i.marbete} className="border-t hover:bg-emerald-50">
-                  <td className="px-4 py-3 font-medium">{i.nombre_activo}</td>
+                <tr key={i.idActivo} className="border-t hover:bg-emerald-50">
+                  <td className="px-4 py-3 font-medium">{i.nombre}</td>
                   <td className="px-4 py-3">{i.edificio}</td>
                   <td className="px-4 py-3">{i.aula}</td>
                   <td className="px-4 py-3">{i.grupo}</td>
 
-                  {/* ACTIVO (LA COSA) */}
                   <td className="px-4 py-3">
                     <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full font-semibold text-sm">
-                      {i.activo}
+                      {i.clave}
                     </span>
                   </td>
 
-                  {/* MARBETE */}
                   <td
                     onClick={() => copiarMarbete(i.marbete)}
                     className="px-4 py-3 font-mono cursor-pointer flex items-center gap-2 hover:text-emerald-700"
@@ -253,7 +242,6 @@ export default function DashboardHome() {
   );
 }
 
-/* KPI */
 function KPI({ icon, label, value }) {
   return (
     <div className="bg-white border border-emerald-200 rounded-xl p-5 shadow flex items-center gap-4">
