@@ -5,9 +5,11 @@ import ActivosGrupo from "../components/ActivosGrupo.jsx";
 import Bajas from "../components/Bajas.jsx";
 import EdificiosSection from "../components/EdificiosSection.jsx";
 import AulasSection from "../components/AulasSection.jsx";
-import ActivosAula from "../components/ActivosAula.jsx"
+import ActivosAula from "../components/ActivosAula.jsx";
 import Reportes from "../components/Reportes.jsx";
 import SolicitarBaja from "../components/SolicitarBaja.jsx";
+import Encargados from "../pages/Encargados.jsx";
+
 export default function SectionRenderer({
   section,
   grupoSeleccionado,
@@ -18,8 +20,6 @@ export default function SectionRenderer({
   setAulaSeleccionada
 }) {
 
-
-
   switch (section) {
     case "dashboard":
       return <DashboardHome />;
@@ -27,10 +27,13 @@ export default function SectionRenderer({
     case "usuarios":
       return <Usuario />;
 
+    case "encargados":
+      return <Encargados />;
+
     case "bajas":
       return <Bajas />;
 
-      case "reportes":
+    case "reportes":
       return <Reportes />;
     
     case "solicitar-baja":
@@ -39,46 +42,45 @@ export default function SectionRenderer({
     case "activos":
       return grupoSeleccionado ? (
         <ActivosGrupo
-  grupoClave={grupoSeleccionado.clave}
-  grupoNombre={grupoSeleccionado.nombre}
-  idGrupo={grupoSeleccionado.id}
-  onBack={() => onOpenCategory(null)}
-/>
+          grupoClave={grupoSeleccionado.clave}
+          grupoNombre={grupoSeleccionado.nombre}
+          idGrupo={grupoSeleccionado.id}
+          onBack={() => onOpenCategory(null)}
+        />
       ) : (
         <ActivosSection onOpenCategory={onOpenCategory} />
       );
 
-case "edificios":
+    case "edificios":
+      if (!edificioSeleccionado) {
+        return (
+          <EdificiosSection
+            onSelectEdificio={setEdificioSeleccionado}
+          />
+        );
+      }
 
-  if (!edificioSeleccionado) {
-    return (
-      <EdificiosSection
-        onSelectEdificio={setEdificioSeleccionado}
-      />
-    );
-  }
+      if (!aulaSeleccionada) {
+        return (
+          <AulasSection
+            idEdificio={edificioSeleccionado.idEdificio}
+            nombreEdificio={edificioSeleccionado.nombre}
+            claveEdificio={edificioSeleccionado.clave}
+            actividadEdificio={edificioSeleccionado.actividad}
+            onBack={() => setEdificioSeleccionado(null)}
+            onSelectAula={setAulaSeleccionada}
+          />
+        );
+      }
 
-  if (!aulaSeleccionada) {
-    return (
-      <AulasSection
-        idEdificio={edificioSeleccionado.idEdificio}
-        nombreEdificio={edificioSeleccionado.nombre}
-        claveEdificio={edificioSeleccionado.clave}
-        actividadEdificio={edificioSeleccionado.actividad}
-        onBack={() => setEdificioSeleccionado(null)}
-        onSelectAula={setAulaSeleccionada}
-      />
-    );
-  }
-
-  return (
-    <ActivosAula
-      idAula={aulaSeleccionada.idAula}
-      nombreAula={aulaSeleccionada.nombre}
-      claveAula={aulaSeleccionada.clave}
-      onBack={() => setAulaSeleccionada(null)}
-    />
-  );
+      return (
+        <ActivosAula
+          idAula={aulaSeleccionada.idAula}
+          nombreAula={aulaSeleccionada.nombre}
+          claveAula={aulaSeleccionada.clave}
+          onBack={() => setAulaSeleccionada(null)}
+        />
+      );
 
     default:
       return (

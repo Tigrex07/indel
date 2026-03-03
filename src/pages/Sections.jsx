@@ -19,5 +19,5 @@ export const sections = [
   { key: "usuarios", label: "Usuarios", icon: <Users size={20} /> },
   { key: "reportes", label: "Reportes", icon: <FileText size={20} /> },
   { key: "solicitar-baja", label: "Solicitar Movimiento", icon: <FileMinus size={20} /> },
-  { key: "preferencias", label: "Preferencias", icon: <Settings size={20} /> }
+  { key: "encargados", label: "Encargados", icon: <Settings size={20} /> }
 ];
