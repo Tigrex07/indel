@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   Document, Page, Text, View, StyleSheet, PDFViewer, Font, Image 
 } from '@react-pdf/renderer';
-// Iconos actualizados para coincidir con el Dashboard
 import { 
   DocumentPlusIcon, 
   TrashIcon, 
@@ -19,7 +18,7 @@ Font.register({
   src: 'https://cdn.jsdelivr.net/npm/react-pdf/dist/fonts/Helvetica-Bold.afm'
 });
 
-// Estilos del PDF se mantienen profesionales para impresión
+// Estilos del PDF se mantienen con el color esmeralda unificado
 const styles = StyleSheet.create({
   page: { padding: 25, backgroundColor: '#fff', fontFamily: 'Helvetica' },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: 5 },
@@ -30,16 +29,16 @@ const styles = StyleSheet.create({
   titleSub: { fontSize: 9, fontFamily: 'Helvetica-Bold', marginTop: 1 },
   titleDept: { fontSize: 8, marginTop: 1 },
   titleOficina: { fontSize: 7, marginTop: 1 },
-  banner: { backgroundColor: '#10b981', color: '#fff', textAlign: 'center', fontSize: 9, padding: 3, marginTop: 8, fontFamily: 'Helvetica-Bold' },
+  banner: { backgroundColor: '#059669', color: '#fff', textAlign: 'center', fontSize: 9, padding: 3, marginTop: 8, fontFamily: 'Helvetica-Bold' },
   typeContainer: { flexDirection: 'row', borderWidth: 1, borderColor: '#000', borderTopWidth: 0 },
   typeCell: { flex: 1, flexDirection: 'row', alignItems: 'center', padding: 4, borderRightWidth: 1, borderColor: '#000', justifyContent: 'center' },
   checkbox: { width: 25, height: 12, borderWidth: 1, borderColor: '#000', marginHorizontal: 8, textAlign: 'center', fontSize: 9, fontFamily: 'Helvetica-Bold' },
   typeText: { fontSize: 7, fontFamily: 'Helvetica-Bold' },
   dataSection: { borderLeftWidth: 1, borderRightWidth: 1, borderColor: '#000' },
   dataRow: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' },
-  labelGray: { backgroundColor: '#e2e8f0', color: '#000', fontSize: 7, padding: 2, textAlign: 'center', fontFamily: 'Helvetica-Bold' },
+  labelGray: { backgroundColor: '#f1f5f9', color: '#000', fontSize: 7, padding: 2, textAlign: 'center', fontFamily: 'Helvetica-Bold' },
   contentCell: { padding: 4, fontSize: 8, minHeight: 18, textTransform: 'uppercase' },
-  tableHeader: { flexDirection: 'row', backgroundColor: '#10b981', color: '#fff', fontSize: 7, fontFamily: 'Helvetica-Bold', textAlign: 'center', marginTop: 8, borderWidth: 1, borderColor: '#000' },
+  tableHeader: { flexDirection: 'row', backgroundColor: '#059669', color: '#fff', fontSize: 7, fontFamily: 'Helvetica-Bold', textAlign: 'center', marginTop: 8, borderWidth: 1, borderColor: '#000' },
   tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderLeftWidth: 1, borderRightWidth: 1, borderColor: '#000', minHeight: 18, alignItems: 'center' },
   colSolic: { width: '10%', borderRightWidth: 1, borderColor: '#000', textAlign: 'center', fontSize: 8 },
   colEntr: { width: '10%', borderRightWidth: 1, borderColor: '#000', textAlign: 'center', fontSize: 8 },
@@ -50,9 +49,6 @@ const styles = StyleSheet.create({
   sigText: { fontSize: 5.5, marginTop: 2 },
   sectionLabel: { fontSize: 7, fontFamily: 'Helvetica-Bold', marginTop: 8 },
   textArea: { borderBottomWidth: 1, borderColor: '#000', fontSize: 8, padding: 4, minHeight: 25 },
-  survey: { marginTop: 15, backgroundColor: '#f8fafc', padding: 8, borderTopWidth: 1, borderColor: '#000' },
-  surveyTitle: { fontSize: 7, fontFamily: 'Helvetica-Bold', textAlign: 'center', marginBottom: 4 },
-  surveyItem: { fontSize: 6.5, marginBottom: 2 },
   metaFooter: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, fontSize: 6 }
 });
 
@@ -85,7 +81,7 @@ const SolicitudPdf = ({ data, items }) => (
         <View style={styles.dataRow}>
           <View style={{ flex: 1.5, borderRightWidth: 1 }}><Text style={styles.labelGray}>DIRECCIÓN SOLICITANTE:</Text><Text style={styles.contentCell}>{data.direccion}</Text></View>
           <View style={{ flex: 0.8, borderRightWidth: 1 }}><Text style={styles.labelGray}>FECHA SOLICITUD:</Text><Text style={styles.contentCell}>{data.fechaSolicitud}</Text></View>
-          <View style={{ flex: 0.5 }}><Text style={styles.labelGray}>FOLIO No.</Text><Text style={[styles.contentCell, { color: '#dc2626', textAlign: 'center', fontFamily: 'Helvetica-Bold' }]}>{data.folio}</Text></View>
+          <View style={{ flex: 0.5 }}><Text style={styles.labelGray}>FOLIO No.</Text><Text style={[styles.contentCell, { color: '#059669', textAlign: 'center', fontFamily: 'Helvetica-Bold' }]}>{data.folio}</Text></View>
         </View>
         <View style={styles.dataRow}>
           <View style={{ flex: 1.5, borderRightWidth: 1 }}><Text style={styles.labelGray}>DEPARTAMENTO SOLICITANTE:</Text><Text style={styles.contentCell}>{data.departamento}</Text></View>
@@ -127,7 +123,6 @@ const SolicitudPdf = ({ data, items }) => (
       <View style={styles.metaFooter}>
         <Text>F06PGRIN04.00</Text>
         <Text>Página 1 de 1</Text>
-        <Text>GRACIAS !!!</Text>
         <Text>Rev. 00</Text>
       </View>
     </Page>
@@ -149,24 +144,27 @@ export default function SolicitarBaja() {
   };
 
   return (
-    <div className="flex h-screen bg-[#f1f5f9] text-[#1e293b] font-sans">
+    <div className="p-6 h-[calc(100vh-2rem)] overflow-hidden flex flex-col md:flex-row gap-6">
+      
       {/* Sidebar de Edición - Estilo Dashboard */}
-      <div className="w-[440px] border-r border-slate-200 overflow-y-auto p-8 bg-white shadow-sm">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="p-2 bg-emerald-100 rounded-lg">
-            <DocumentPlusIcon className="w-6 h-6 text-emerald-600" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-slate-800">Nueva Solicitud</h2>
-            <p className="text-xs text-slate-500 font-medium">Gestión de Movimientos de Activos</p>
+      <div className="w-full md:w-[420px] bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col">
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="p-2 bg-emerald-50 rounded-xl text-[#059669]">
+              <DocumentPlusIcon className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-800">Nueva Solicitud</h2>
+              <p className="text-xs text-gray-400 font-medium">Control de Movimientos</p>
+            </div>
           </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-600 uppercase tracking-wider ml-1">Tipo de Movimiento</label>
+        <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Tipo de Movimiento</label>
             <select 
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all cursor-pointer"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm font-semibold focus:ring-2 focus:ring-[#059669]/20 focus:border-[#059669] outline-none transition-all cursor-pointer"
               onChange={e => setData({...data, tipo: e.target.value})}
             >
               <option value="ASIGNACION">Asignación de Activo</option>
@@ -178,31 +176,30 @@ export default function SolicitarBaja() {
 
           <div className="grid grid-cols-2 gap-4">
             <Input label="Folio Interno" placeholder="001-2026" value={data.folio} onChange={v => setData({...data, folio: v})} />
-            <Input label="Fecha Solicitud" type="text" placeholder="12-Feb-26" value={data.fechaSolicitud} onChange={v => setData({...data, fechaSolicitud: v})} />
+            <Input label="Fecha Solicitud" placeholder="12-Feb-26" value={data.fechaSolicitud} onChange={v => setData({...data, fechaSolicitud: v})} />
           </div>
 
-          <Input label="Dirección Solicitante" placeholder="Ej. Dirección Académica" value={data.direccion} onChange={v => setData({...data, direccion: v})} />
-          <Input label="Departamento" placeholder="Ej. Laboratorio de Cómputo" value={data.departamento} onChange={v => setData({...data, departamento: v})} />
+          <Input label="Dirección Solicitante" placeholder="Dirección Académica" value={data.direccion} onChange={v => setData({...data, direccion: v})} />
+          <Input label="Departamento" placeholder="Laboratorio de Cómputo" value={data.departamento} onChange={v => setData({...data, departamento: v})} />
           
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-600 uppercase tracking-wider ml-1">Justificación</label>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Justificación</label>
             <textarea 
-              placeholder="Describa el motivo del movimiento..."
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm h-24 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all resize-none"
+              placeholder="Describa el motivo..."
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm font-medium h-24 outline-none focus:ring-2 focus:ring-[#059669]/20 focus:border-[#059669] transition-all resize-none"
               onChange={e => setData({...data, justificacion: e.target.value})}
             />
           </div>
 
-          {/* Sección de Bienes - Estilo Tarjeta */}
-          <div className="pt-6 border-t border-slate-100">
+          <div className="pt-4 border-t border-gray-100">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
-                <Squares2X2Icon className="w-4 h-4 text-emerald-600" />
-                <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Lista de Bienes</span>
+                <Squares2X2Icon className="w-4 h-4 text-[#059669]" />
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Bienes a Movilizar</span>
               </div>
               <button 
                 onClick={() => setItems([...items, { solic: '', entr: '', desc: '', ubic: '' }])}
-                className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                className="flex items-center gap-1.5 bg-emerald-50 text-[#059669] hover:bg-[#059669] hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-emerald-100"
               >
                 <PlusCircleIcon className="w-4 h-4" />
                 Añadir
@@ -211,17 +208,17 @@ export default function SolicitarBaja() {
 
             <div className="space-y-3">
               {items.map((it, i) => (
-                <div key={i} className="bg-slate-50/50 p-4 rounded-xl border border-slate-200 relative group hover:bg-white hover:shadow-md transition-all">
+                <div key={i} className="bg-gray-50 border border-gray-100 p-4 rounded-xl relative group hover:border-[#059669]/30 transition-all">
                   <input 
-                    placeholder="Descripción del bien o mobiliario..." 
-                    className="w-full bg-transparent border-b border-slate-200 text-sm mb-3 pb-1 outline-none focus:border-emerald-500"
+                    placeholder="Descripción del bien..." 
+                    className="w-full bg-transparent border-b border-gray-200 text-sm font-bold mb-3 pb-1 outline-none focus:border-[#059669]"
                     value={it.desc}
                     onChange={e => updateItem(i, 'desc', e.target.value)}
                   />
                   <div className="flex gap-3">
-                    <input placeholder="Cant." className="w-16 bg-white border border-slate-200 rounded-lg p-2 text-xs focus:border-emerald-500 outline-none" value={it.solic} onChange={e => updateItem(i, 'solic', e.target.value)} />
-                    <input placeholder="Ubicación destino..." className="flex-1 bg-white border border-slate-200 rounded-lg p-2 text-xs focus:border-emerald-500 outline-none" value={it.ubic} onChange={e => updateItem(i, 'ubic', e.target.value)} />
-                    <button onClick={() => setItems(items.filter((_, idx) => idx !== i))} className="text-slate-300 hover:text-red-500 transition-colors">
+                    <input placeholder="Cant." className="w-16 bg-white border border-gray-200 rounded-lg p-2 text-xs font-bold focus:border-[#059669] outline-none" value={it.solic} onChange={e => updateItem(i, 'solic', e.target.value)} />
+                    <input placeholder="Ubicación destino..." className="flex-1 bg-white border border-gray-200 rounded-lg p-2 text-xs font-bold focus:border-[#059669] outline-none" value={it.ubic} onChange={e => updateItem(i, 'ubic', e.target.value)} />
+                    <button onClick={() => setItems(items.filter((_, idx) => idx !== i))} className="text-gray-300 hover:text-red-500 transition-colors">
                       <TrashIcon className="w-5 h-5"/>
                     </button>
                   </div>
@@ -232,30 +229,28 @@ export default function SolicitarBaja() {
         </div>
       </div>
 
-      {/* Visor de PDF - Contenedor */}
-      <div className="flex-1 p-8 flex flex-col">
-        <div className="flex justify-between items-center mb-6">
-            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em]">Vista Previa del Documento</h3>
+      {/* Visor de PDF */}
+      <div className="flex-1 flex flex-col bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Vista Previa de Impresión</h3>
             <div className="flex gap-3">
-                 <button className="flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
+                 <button className="flex items-center gap-2 bg-white border border-gray-200 px-4 py-1.5 rounded-lg text-xs font-bold text-gray-600 hover:bg-[#059669] hover:text-white hover:border-[#059669] transition-all shadow-sm">
                     <ArrowDownTrayIcon className="w-4 h-4" />
-                    Exportar
+                    Exportar PDF
                  </button>
             </div>
         </div>
         
-        <div className="flex-1 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <div className="flex-1 bg-gray-100/50 p-4">
           {isClient ? (
-            <PDFViewer className="w-full h-full border-none">
+            <PDFViewer className="w-full h-full rounded-lg border border-gray-200 shadow-inner">
               <SolicitudPdf data={data} items={items} />
             </PDFViewer>
           ) : (
             <div className="flex items-center justify-center h-full">
                 <div className="animate-pulse flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
-                        <DocumentPlusIcon className="w-6 h-6 text-emerald-600" />
-                    </div>
-                    <p className="text-slate-400 text-sm font-medium">Preparando documento...</p>
+                    <LoaderIcon />
+                    <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">Generando documento...</p>
                 </div>
             </div>
           )}
@@ -265,14 +260,17 @@ export default function SolicitarBaja() {
   );
 }
 
-// Componente Reutilizable de Input con Estilo Dashboard
 const Input = ({ label, onChange, ...props }) => (
-  <div className="space-y-1">
-    <label className="text-xs font-bold text-slate-600 uppercase tracking-wider ml-1">{label}</label>
+  <div className="space-y-1.5">
+    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">{label}</label>
     <input 
       {...props}
-      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" 
+      className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-[#059669]/20 focus:border-[#059669] transition-all" 
       onChange={e => onChange(e.target.value)}
     />
   </div>
+);
+
+const LoaderIcon = () => (
+    <div className="w-10 h-10 border-4 border-emerald-100 border-t-[#059669] rounded-full animate-spin"></div>
 );
