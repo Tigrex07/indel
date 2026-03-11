@@ -8,6 +8,7 @@ const API_MODAL = "https://corporacionperris.com/backend/api/activoModal.php";
 const ITEMS_PER_PAGE = 7;
 
 export default function DashboardHome() {
+
   const [query, setQuery] = useState("");
   const [edificio, setEdificio] = useState("Todos");
   const [grupo, setGrupo] = useState("Todos");
@@ -87,28 +88,29 @@ export default function DashboardHome() {
     setTimeout(() => setCopiado(""), 1500);
   };
 
+  /* =========================
+     ABRIR ACTIVO (MODAL)
+  ========================= */
+  const abrirActivo = async (activo) => {
 
-  //abrir el modal para ver los detalles
-      const abrirActivo = async (activo) => {
+    try {
 
-        try {
+      const res = await fetch(`${API_MODAL}?idActivo=${activo.idActivo}`, {
+        credentials: "include"
+      });
 
-          const res = await fetch(`${API_MODAL}?idActivo=${activo.idActivo}`, {
-            credentials: "include"
-          });
+      const json = await res.json();
 
-          const json = await res.json();
+      if (json.success && json.data.length > 0) {
+        setActivoSeleccionado(json.data[0]);
+        setEditMode(false);
+      }
 
-          if (json.success && json.data.length > 0) {
-            setActivoSeleccionado(json.data[0]);
-            setEditMode(false);
-          }
+    } catch (error) {
+      console.error("Error cargando activo:", error);
+    }
 
-        } catch (error) {
-          console.error("Error cargando activo:", error);
-        }
-
-      };
+  };
 
   if (loading) {
     return <p className="text-gray-600">Cargando datos…</p>;
@@ -187,12 +189,14 @@ export default function DashboardHome() {
               Limpiar
             </button>
           </div>
+
         </div>
       </div>
 
       {/* TABLA */}
       <div className="bg-white border border-emerald-200 rounded-xl shadow overflow-hidden">
         <table className="w-full text-left">
+
           <thead className="bg-emerald-600 text-white">
             <tr>
               <th className="px-4 py-3">Nombre</th>
@@ -208,10 +212,11 @@ export default function DashboardHome() {
             {paginaData.length ? (
               paginaData.map((i) => (
                 <tr
-                    key={i.idActivo}
-                    onClick={() => abrirActivo(i)}
-                    className="border-t hover:bg-emerald-50 cursor-pointer"
-                  >
+                  key={i.idActivo}
+                  onClick={() => abrirActivo(i)}
+                  className="border-t hover:bg-emerald-50 cursor-pointer"
+                >
+
                   <td className="px-4 py-3 font-medium">{i.nombre}</td>
                   <td className="px-4 py-3">{i.edificio}</td>
                   <td className="px-4 py-3">{i.aula}</td>
@@ -224,7 +229,10 @@ export default function DashboardHome() {
                   </td>
 
                   <td
-                    onClick={() => copiarMarbete(i.marbete)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      copiarMarbete(i.marbete);
+                    }}
                     className="px-4 py-3 font-mono cursor-pointer flex items-center gap-2 hover:text-emerald-700"
                   >
                     {i.marbete}
@@ -234,6 +242,7 @@ export default function DashboardHome() {
                       <Copy size={16} className="text-gray-500" />
                     )}
                   </td>
+
                 </tr>
               ))
             ) : (
@@ -244,11 +253,13 @@ export default function DashboardHome() {
               </tr>
             )}
           </tbody>
+
         </table>
       </div>
 
       {/* PAGINACIÓN */}
       <div className="flex justify-between items-center pt-4">
+
         <button
           onClick={() => cambiarPagina(-1)}
           disabled={page === 1}
@@ -268,9 +279,10 @@ export default function DashboardHome() {
         >
           Siguiente
         </button>
+
       </div>
 
-          {activoSeleccionado && (
+      {activoSeleccionado && (
         <ActivoModal
           activo={activoSeleccionado}
           onClose={() => setActivoSeleccionado(null)}
@@ -280,9 +292,6 @@ export default function DashboardHome() {
       )}
 
     </div>
-
-
-
   );
 }
 
@@ -299,5 +308,3 @@ function KPI({ icon, label, value }) {
     </div>
   );
 }
-
-
