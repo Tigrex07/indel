@@ -1,8 +1,10 @@
 import { Search, ChevronDown, Copy, CheckCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Building2, Layers, Users } from "lucide-react";
+import ActivoModal from "../components/ActivoModal";
 
 const API_URL = "https://corporacionperris.com/backend/api/inventario.php";
+const API_MODAL = "https://corporacionperris.com/backend/api/activoModal.php";
 const ITEMS_PER_PAGE = 7;
 
 export default function DashboardHome() {
@@ -15,6 +17,9 @@ export default function DashboardHome() {
 
   const [page, setPage] = useState(1);
   const [copiado, setCopiado] = useState("");
+
+  const [activoSeleccionado, setActivoSeleccionado] = useState(null);
+  const [editMode, setEditMode] = useState(false);
 
   /* =========================
      CARGAR DATOS
@@ -81,6 +86,29 @@ export default function DashboardHome() {
     setCopiado(m);
     setTimeout(() => setCopiado(""), 1500);
   };
+
+
+  //abrir el modal para ver los detalles
+      const abrirActivo = async (activo) => {
+
+        try {
+
+          const res = await fetch(`${API_MODAL}?idActivo=${activo.idActivo}`, {
+            credentials: "include"
+          });
+
+          const json = await res.json();
+
+          if (json.success && json.data.length > 0) {
+            setActivoSeleccionado(json.data[0]);
+            setEditMode(false);
+          }
+
+        } catch (error) {
+          console.error("Error cargando activo:", error);
+        }
+
+      };
 
   if (loading) {
     return <p className="text-gray-600">Cargando datos…</p>;
@@ -179,7 +207,11 @@ export default function DashboardHome() {
           <tbody>
             {paginaData.length ? (
               paginaData.map((i) => (
-                <tr key={i.idActivo} className="border-t hover:bg-emerald-50">
+                <tr
+                    key={i.idActivo}
+                    onClick={() => abrirActivo(i)}
+                    className="border-t hover:bg-emerald-50 cursor-pointer"
+                  >
                   <td className="px-4 py-3 font-medium">{i.nombre}</td>
                   <td className="px-4 py-3">{i.edificio}</td>
                   <td className="px-4 py-3">{i.aula}</td>
@@ -238,7 +270,19 @@ export default function DashboardHome() {
         </button>
       </div>
 
+          {activoSeleccionado && (
+        <ActivoModal
+          activo={activoSeleccionado}
+          onClose={() => setActivoSeleccionado(null)}
+          editMode={editMode}
+          setEditMode={setEditMode}
+        />
+      )}
+
     </div>
+
+
+
   );
 }
 
@@ -255,3 +299,5 @@ function KPI({ icon, label, value }) {
     </div>
   );
 }
+
+
