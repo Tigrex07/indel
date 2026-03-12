@@ -9,7 +9,7 @@ import ActivosAula from "../components/ActivosAula.jsx";
 import Reportes from "../components/Reportes.jsx";
 import SolicitarBaja from "../components/SolicitarBaja.jsx";
 import Encargados from "../pages/Encargados.jsx";
-
+import Recursos from "../components/Recursos.jsx"; 
 export default function SectionRenderer({
   section,
   grupoSeleccionado,
@@ -35,6 +35,9 @@ export default function SectionRenderer({
 
     case "reportes":
       return <Reportes />;
+
+    case "recursos":
+      return <Recursos />;
     
     case "solicitar-baja":
       return <SolicitarBaja />;

@@ -7,7 +7,8 @@ import {
   FileText,
   FileMinus,
   Building2,
-  ShieldUser
+  ShieldUser,
+  Library
 } from "lucide-react";
 
 export const sections = [
@@ -51,6 +52,12 @@ export const sections = [
     key: "solicitar-baja", 
     label: "Solicitar Movimiento", 
     icon: <FileMinus size={20} />,
+    roles: ["Docente", "Administrador", "Encargado"] 
+  },
+  { 
+    key: "recursos", 
+    label: "Recursos", 
+    icon: <Library size={20} />,
     roles: ["Docente", "Administrador", "Encargado"] 
   },
   { 
