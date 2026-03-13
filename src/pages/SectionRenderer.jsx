@@ -9,9 +9,12 @@ import ActivosAula from "../components/ActivosAula.jsx";
 import Reportes from "../components/Reportes.jsx";
 import SolicitarBaja from "../components/SolicitarBaja.jsx";
 import Encargados from "../pages/Encargados.jsx";
-import Recursos from "../components/Recursos.jsx"; 
+import Recursos from "../components/Recursos.jsx";
+import Transferencias from "../pages/Transferencias.jsx";
+
 export default function SectionRenderer({
   section,
+  role, // Viene de Dashboard.jsx
   grupoSeleccionado,
   onOpenCategory,
   edificioSeleccionado,
@@ -20,6 +23,30 @@ export default function SectionRenderer({
   setAulaSeleccionada
 }) {
 
+  const permisos = {
+    "Administrador": ["dashboard", "usuarios", "encargados", "activos", "edificios", "transferencias", "bajas", "recursos", "reportes", "solicitar-baja"], // <-- AÑADIDO AQUÍ
+    "Soporte": ["dashboard", "activos", "edificios", "transferencias", "bajas", "recursos", "reportes", "solicitar-baja"], // <-- AÑADIDO AQUÍ TAMBIÉN
+    "Docente": ["solicitar-baja", "recursos"],
+    "Encargado": ["solicitar-baja", "recursos"]
+  };
+
+  // 2. Validación de seguridad
+  const tieneAcceso = permisos[role]?.includes(section);
+
+  if (role && !tieneAcceso) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+        <div className="bg-red-50 text-red-500 p-8 rounded-[2rem] border border-red-100 shadow-xl">
+          <h2 className="text-xl font-black uppercase italic">Acceso Denegado</h2>
+          <p className="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-[0.2em]">
+            Tu nivel de usuario ({role}) no permite ver esta sección.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. Renderizado de componentes
   switch (section) {
     case "dashboard":
       return <DashboardHome />;
@@ -38,22 +65,30 @@ export default function SectionRenderer({
 
     case "recursos":
       return <Recursos />;
+
+    case "transferencias":
+      return <Transferencias />;
     
     case "solicitar-baja":
       return <SolicitarBaja />;
 
-case "activos":
-  return grupoSeleccionado ? (
-    <ActivosGrupo
-      grupoClave={grupoSeleccionado.clave}
-      grupoNombre={grupoSeleccionado.nombre}
-      idGrupo={grupoSeleccionado.idGrupo}
-      onBack={() => onOpenCategory(null)}
-    />
-  ) : (
-    <ActivosSection onOpenCategory={onOpenCategory} />
-  );
+    case "activos":
+      // Si seleccionamos un grupo (ej. Escritorios), mostramos el inventario de ese grupo
+      if (grupoSeleccionado) {
+        return (
+          <ActivosGrupo
+            grupoClave={grupoSeleccionado.clave}
+            grupoNombre={grupoSeleccionado.nombre}
+            idGrupo={grupoSeleccionado.idGrupo}
+            onBack={() => onOpenCategory(null)}
+          />
+        );
+      }
+      // Si no, mostramos la cuadrícula de grupos
+      return <ActivosSection onOpenCategory={onOpenCategory} />;
+
     case "edificios":
+      // Nivel 1: Lista de Edificios
       if (!edificioSeleccionado) {
         return (
           <EdificiosSection
@@ -62,6 +97,7 @@ case "activos":
         );
       }
 
+      // Nivel 2: Lista de Aulas del edificio seleccionado
       if (!aulaSeleccionada) {
         return (
           <AulasSection
@@ -75,6 +111,7 @@ case "activos":
         );
       }
 
+      // Nivel 3: Activos dentro del aula seleccionada
       return (
         <ActivosAula
           idAula={aulaSeleccionada.idAula}
@@ -85,10 +122,6 @@ case "activos":
       );
 
     default:
-      return (
-        <div className="bg-white p-10 rounded-xl shadow border">
-          Sección en construcción…
-        </div>
-      );
+      return <DashboardHome />;
   }
 }

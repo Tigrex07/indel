@@ -1,26 +1,29 @@
 import React, { useState } from "react";
-import { LogOut, UserCircle, LayoutDashboard, ChevronRight, AlertCircle } from "lucide-react";
-import { sections } from "./Sections.jsx";
+import { LogOut, LayoutDashboard, AlertCircle, Users, Package, Building2, FileText, Download, Trash2, User, ClipboardList } from "lucide-react";
+
+// 1. Definición de secciones con los nombres EXACTOS de tu imagen
+const sections = [
+  { key: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20}/>, roles: ["Administrador", "Soporte"] },
+  { key: "activos", label: "Grupos", icon: <Package size={20}/>, roles: ["Administrador", "Soporte"] },
+  { key: "edificios", label: "Edificios", icon: <Building2 size={20}/>, roles: ["Administrador", "Soporte"] },
+  { key: "bajas", label: "Gestión de Solicitudes", icon: <Trash2 size={20}/>, roles: ["Administrador", "Soporte"] },
+  { key: "usuarios", label: "Usuarios", icon: <Users size={20}/>, roles: ["Administrador"] },
+  { key: "reportes", label: "Reportes", icon: <ClipboardList size={20}/>, roles: ["Administrador", "Soporte"] },
+  { key: "solicitar-baja", label: "Solicitar Movimiento", icon: <FileText size={20}/>, roles: ["Administrador", "Soporte", "Docente"] },
+  { key: "recursos", label: "Recursos", icon: <Download size={20}/>, roles: ["Administrador", "Soporte", "Docente"] },
+  { key: "encargados", label: "Encargados", icon: <User size={20}/>, roles: ["Administrador"] },
+];
 
 export default function Sidebar({ activeSection, setActiveSection, username, userRole, onLogout }) {
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // Filtrado ultra-seguro
   const getFilteredSections = () => {
-    // Si por alguna razón 'sections' no existe, devolvemos un array vacío para no romper React
     if (!sections || !Array.isArray(sections)) return [];
-
-    // Si no hay userRole, mostramos todas las secciones (evita pantalla en blanco)
-    if (!userRole) return sections;
+    if (!userRole) return sections; // Mostrar todo si no hay rol para evitar bloqueos iniciales
 
     return sections.filter((s) => {
-      // Si la sección no tiene roles definidos, la mostramos
       if (!s.roles) return true;
-      
-      // Comparamos sin importar mayúsculas/minúsculas o espacios
-      return s.roles.some(r => 
-        r.toLowerCase().trim() === userRole.toLowerCase().trim()
-      );
+      return s.roles.some(r => r.toLowerCase().trim() === userRole.toLowerCase().trim());
     });
   };
 
@@ -37,7 +40,7 @@ export default function Sidebar({ activeSection, setActiveSection, username, use
               <LayoutDashboard size={24} className="text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-white">Indeltario</h2>
+              <h2 className="text-2xl font-bold tracking-tight text-white italic">Indeltario</h2>
               <p className="text-[10px] text-emerald-200 font-medium uppercase mt-1 opacity-80">
                 {userRole || "ADMIN PANEL"}
               </p>
@@ -55,8 +58,10 @@ export default function Sidebar({ activeSection, setActiveSection, username, use
             <button
               key={s.key}
               onClick={() => setActiveSection(s.key)}
-              className={`flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all duration-200
-                ${activeSection === s.key ? "bg-emerald-600 text-white shadow-lg" : "text-emerald-100 hover:bg-emerald-600/50"}`}
+              className={`flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all duration-200 group
+                ${activeSection === s.key 
+                  ? "bg-emerald-600 text-white shadow-lg" 
+                  : "text-emerald-100 hover:bg-emerald-600/50"}`}
             >
               <div className="flex items-center gap-3 font-semibold text-sm">
                 <span>{s.icon}</span>
@@ -75,7 +80,7 @@ export default function Sidebar({ activeSection, setActiveSection, username, use
                 {username ? username.charAt(0).toUpperCase() : "?"}
               </div>
               <div className="overflow-hidden">
-                <p className="text-[10px] font-medium text-emerald-300 uppercase leading-none mb-1">{userRole || "Rol"}</p>
+                <p className="text-[10px] font-medium text-emerald-300 uppercase leading-none mb-1 tracking-widest">{userRole}</p>
                 <p className="text-sm font-bold truncate text-white">{username || "Usuario"}</p>
               </div>
             </div>
@@ -93,16 +98,16 @@ export default function Sidebar({ activeSection, setActiveSection, username, use
 
       {/* MODAL DE CONFIRMACIÓN */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-xs rounded-2xl shadow-2xl p-6 text-center border border-gray-100">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 text-gray-900">
+          <div className="bg-white w-full max-w-xs rounded-2xl shadow-2xl p-6 text-center border border-gray-100 animate-in zoom-in duration-200">
             <div className="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertCircle size={28} />
             </div>
-            <h3 className="text-lg font-bold text-gray-800">¿Cerrar Sesión?</h3>
-            <p className="text-gray-500 text-xs mt-2 mb-6">Estás a punto de salir del sistema.</p>
+            <h3 className="text-lg font-bold text-gray-800 italic">¿Cerrar Sesión?</h3>
+            <p className="text-gray-500 text-xs mt-2 mb-6 uppercase font-bold tracking-tighter">Estás a punto de salir del sistema.</p>
             <div className="flex gap-2">
-              <button onClick={() => setShowConfirm(false)} className="flex-1 py-2 rounded-xl border border-gray-200 text-gray-600 font-bold text-xs uppercase hover:bg-gray-50">No</button>
-              <button onClick={onLogout} className="flex-1 py-2 rounded-xl bg-red-600 text-white font-bold text-xs uppercase hover:bg-red-700 shadow-lg">Sí, salir</button>
+              <button onClick={() => setShowConfirm(false)} className="flex-1 py-2 rounded-xl border border-gray-200 text-gray-400 font-bold text-xs uppercase hover:bg-gray-50 transition-colors">No</button>
+              <button onClick={onLogout} className="flex-1 py-2 rounded-xl bg-red-600 text-white font-bold text-xs uppercase hover:bg-red-700 shadow-xl shadow-red-200 transition-transform active:scale-95">Sí, salir</button>
             </div>
           </div>
         </div>
