@@ -47,16 +47,16 @@ export default function Dashboard({ onLogout }) {
               aulaSeleccionada={aulaSeleccionada}
               setAulaSeleccionada={setAulaSeleccionada}
 
-              onOpenCategory={(clave, nombre, id) => {
+              onOpenCategory={(grupo) => {
 
-                if (clave === null) {
-                  setGrupoSeleccionado(null);
-                  return;
-                }
+                  if (grupo === null) {
+                    setGrupoSeleccionado(null);
+                    return;
+                  }
 
-                setGrupoSeleccionado({ clave, nombre, id });
-                setActiveSection("activos");
-              }}
+                  setGrupoSeleccionado(grupo);
+                  setActiveSection("activos");
+                }}
             />
 
       </main>
