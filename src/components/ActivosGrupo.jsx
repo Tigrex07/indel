@@ -138,17 +138,19 @@ export default function ActivosGrupo({ grupoClave, grupoNombre, idGrupo, onBack 
 
     {/* HEADER */}
     <div className="flex justify-between items-center">
-      <h2 className="text-3xl font-bold text-emerald-700 tracking-tight">
-  Activos · {grupoNombre}
-</h2>
 
-      <button
-        onClick={abrirNuevo}
-        className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition-all"
-      >
-        <Plus size={18} />
-        <span className="font-medium">Agregar</span>
-      </button>
+      <div>
+        <h2 className="text-3xl font-bold text-emerald-700 tracking-tight">
+          Activos
+        </h2>
+
+        <p className="text-gray-600 font-medium">
+          Grupo: <span className="text-emerald-700">{grupoNombre} ({grupoClave})</span>
+        </p>
+      </div>
+
+      
+
     </div>
 
     {/* BUSCADOR */}
@@ -175,55 +177,50 @@ export default function ActivosGrupo({ grupoClave, grupoNombre, idGrupo, onBack 
             <th className="p-3 font-semibold">Aula</th>
             <th className="p-3 font-semibold">Activo</th>
             <th className="p-3 font-semibold">Marbete</th>
-            <th className="p-3"></th>
+            <th className="p-3 font-semibold text-right">Importe</th>
           </tr>
         </thead>
 
         <tbody>
-          {paginaData.map((i) => {
-            const activo = i.marbete.split("-").pop();
+            {paginaData.map((i) => {
+              const activo = i.marbete.split("-").pop();
 
-            return (
-              <tr
-                key={i.idActivo}
-                className="border-t hover:bg-emerald-50 transition-all"
-              >
-                <td className="p-3 font-medium text-gray-800">
-                  {i.nombre_activo}
-                </td>
+              return (
+                <tr
+                  key={i.idActivo}
+                  className="border-t hover:bg-emerald-50 transition-all"
+                >
+                  <td className="p-3 font-medium text-gray-800">
+                    {i.nombre_activo}
+                  </td>
 
-                <td className="p-3 text-gray-700">{i.edificio}</td>
-                <td className="p-3 text-gray-700">{i.aula}</td>
+                  <td className="p-3 text-gray-700">{i.edificio}</td>
+                  <td className="p-3 text-gray-700">{i.aula}</td>
 
-                <td className="p-3">
-                  <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-mono text-sm shadow-sm">
-                    {activo}
-                  </span>
-                </td>
+                  <td className="p-3">
+                    <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-mono text-sm shadow-sm">
+                      {activo}
+                    </span>
+                  </td>
 
-                <td className="p-3 font-mono flex items-center gap-2 text-gray-700">
-                  {i.marbete}
-                  <button onClick={() => copiar(i.marbete)}>
-                    {copiado === i.marbete ? (
-                      <CheckCircle size={16} className="text-green-600" />
-                    ) : (
-                      <Copy size={16} className="text-gray-500 hover:text-gray-700" />
-                    )}
-                  </button>
-                </td>
+                  <td className="p-3 font-mono flex items-center gap-2 text-gray-700">
+                    {i.marbete}
+                    <button onClick={() => copiar(i.marbete)}>
+                      {copiado === i.marbete ? (
+                        <CheckCircle size={16} className="text-green-600" />
+                      ) : (
+                        <Copy size={16} className="text-gray-500 hover:text-gray-700" />
+                      )}
+                    </button>
+                  </td>
 
-                <td className="p-3">
-                  <button
-                    onClick={() => abrirEditar(i)}
-                    className="text-gray-600 hover:text-emerald-700 transition"
-                  >
-                    <Pencil size={18} />
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
+                  <td className="p-3 text-right font-semibold text-gray-800">
+                    {i.importe ? `$${Number(i.importe).toLocaleString()}` : "-"}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
       </table>
     </div>
 
