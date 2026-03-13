@@ -266,7 +266,7 @@ const inactivos = grupos.filter(g => g.actividad == 0).length;
                 ? "bg-white border border-gray-200 hover:shadow-xl hover:bg-emerald-50 hover:border-emerald-400"
                 : "bg-gray-100 border border-gray-300 opacity-70"
               }`}
-            onClick={() => onOpenCategory(grupo.clave)}
+            onClick={() => onOpenCategory(grupo)}
           >
 
             {/* ICONO */}
