@@ -42,18 +42,17 @@ export default function SectionRenderer({
     case "solicitar-baja":
       return <SolicitarBaja />;
 
-    case "activos":
-      return grupoSeleccionado ? (
-        <ActivosGrupo
-          grupoClave={grupoSeleccionado.clave}
-          grupoNombre={grupoSeleccionado.nombre}
-          idGrupo={grupoSeleccionado.id}
-          onBack={() => onOpenCategory(null)}
-        />
-      ) : (
-        <ActivosSection onOpenCategory={onOpenCategory} />
-      );
-
+case "activos":
+  return grupoSeleccionado ? (
+    <ActivosGrupo
+      grupoClave={grupoSeleccionado.clave}
+      grupoNombre={grupoSeleccionado.nombre}
+      idGrupo={grupoSeleccionado.idGrupo}
+      onBack={() => onOpenCategory(null)}
+    />
+  ) : (
+    <ActivosSection onOpenCategory={onOpenCategory} />
+  );
     case "edificios":
       if (!edificioSeleccionado) {
         return (
