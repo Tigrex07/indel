@@ -2,8 +2,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import { 
   BookOpen, Printer, Download, Search, 
   ShieldCheck, Eye, X, ChevronRight, Library, 
-  Loader2, CheckCircle2, Info
-} from "lucide-react"; // <--- Corregido de lucide-center a lucide-react
+  Loader2, CheckCircle2, Info, Square, CheckSquare, Trash2, ListChecks
+} from "lucide-react";
 import { PDFViewer, Document, Page, View, Text, Image, StyleSheet } from '@react-pdf/renderer';
 
 // Importación de datos y recursos
@@ -12,29 +12,42 @@ import logoUtn from '../assets/utn.png';
 
 const API_URL = "https://corporacionperris.com/backend/api/inventario.php";
 
-// --- ESTILOS PARA EL PDF DEL MARBETE ---
+// --- ESTILOS PDF (Diseño de la foto) ---
 const pdfStyles = StyleSheet.create({
-  page: { width: 150, height: 250, padding: 15, alignItems: 'center', backgroundColor: '#fff' },
-  header: { alignItems: 'center', marginBottom: 10 },
-  logo: { width: 45, height: 45 },
-  title: { fontSize: 7, fontWeight: 'bold', textAlign: 'center', marginTop: 5, color: '#065f46' },
-  activoName: { fontSize: 9, textAlign: 'center', marginVertical: 15, textTransform: 'uppercase', fontWeight: 'bold' },
-  barcodeSim: { backgroundColor: '#000', width: '100%', height: 35, marginBottom: 5 },
-  clave: { fontSize: 10, fontWeight: 'bold', letterSpacing: 1 },
-  footer: { position: 'absolute', bottom: 10, fontSize: 6, color: '#666', borderTopWidth: 1, borderTopColor: '#eee', width: '80%', textAlign: 'center', paddingTop: 5 }
+  page: { padding: 20, backgroundColor: '#fff', flexDirection: 'row', flexWrap: 'wrap', gap: 15 },
+  card: { width: 250, height: 120, padding: 10, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#000' },
+  logoContainer: { width: '28%', alignItems: 'center', justifyContent: 'center', borderRightWidth: 1, borderRightColor: '#000', paddingRight: 5, height: '90%' },
+  logo: { width: 32, height: 32 },
+  slogan: { fontSize: 4, marginTop: 4, fontWeight: 'black', textAlign: 'center' },
+  infoContainer: { width: '72%', paddingLeft: 8, justifyContent: 'center' },
+  textMain: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', marginBottom: 2 },
+  textSecondary: { fontSize: 6, marginBottom: 1, textTransform: 'uppercase' },
+  marbeteGrande: { fontSize: 13, fontWeight: 'bold', marginVertical: 2 },
+  footerRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4, borderTopWidth: 0.5, borderTopColor: '#000', paddingTop: 3 },
+  textFooter: { fontSize: 5.5, fontWeight: 'bold', textTransform: 'uppercase' }
 });
 
-const MarbetePDF = ({ activo }) => (
+const MarbetesMultiplesPDF = ({ seleccionados }) => (
   <Document>
-    <Page size={[160, 260]} style={pdfStyles.page}>
-      <View style={pdfStyles.header}>
-        <Image src={logoUtn} style={pdfStyles.logo} />
-        <Text style={pdfStyles.title}>UNIVERSIDAD TECNOLÓGICA DE NOGALES</Text>
-      </View>
-      <Text style={pdfStyles.activoName}>{activo?.nombre || "SIN NOMBRE"}</Text>
-      <View style={pdfStyles.barcodeSim} />
-      <Text style={pdfStyles.clave}>{activo?.marbete || "000000"}</Text>
-      <Text style={pdfStyles.footer}>SISTEMA DE INVENTARIOS 2026</Text>
+    <Page size="A4" style={pdfStyles.page}>
+      {seleccionados.map((activo, index) => (
+        <View key={index} style={pdfStyles.card}>
+          <View style={pdfStyles.logoContainer}>
+            <Image src={logoUtn} style={pdfStyles.logo} />
+            <Text style={pdfStyles.slogan}>OPCIÓN CON FUTURO</Text>
+          </View>
+          <View style={pdfStyles.infoContainer}>
+            <Text style={pdfStyles.textMain}>UNIVERSIDAD TECNOLÓGICA DE NOGALES</Text>
+            <Text style={pdfStyles.textSecondary}>FECHA: {activo.fecha || "MARZO 2026"}</Text>
+            <Text style={pdfStyles.marbeteGrande}>{activo.marbete}</Text>
+            <Text style={pdfStyles.textMain}>{activo.ubicacion || "AULA No. 12, DOC. II"}</Text>
+            <View style={pdfStyles.footerRow}>
+              <Text style={pdfStyles.textFooter}>{activo.nombre}</Text>
+              <Text style={pdfStyles.textFooter}>{activo.serie || "S/N"}</Text>
+            </View>
+          </View>
+        </View>
+      ))}
     </Page>
   </Document>
 );
@@ -44,14 +57,14 @@ export default function Recursos() {
   const [busqueda, setBusqueda] = useState("");
   const [activos, setActivos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [activoSeleccionado, setActivoSeleccionado] = useState(null);
+  const [seleccionados, setSeleccionados] = useState([]);
   const [guiaAbierta, setGuiaAbierta] = useState(null);
   const [isModalPDF, setIsModalPDF] = useState(false);
 
-  // Función para descargar la guía en formato TXT
+  // Función para descargar guías (Vuelve a estar aquí)
   const descargarGuia = (id) => {
     const guia = GuiasData[id];
-    const contenido = `GUÍA: ${guia.titulo}\n${guia.subtitulo}\n\nDescripción: ${id === 'admin' ? "Manual para administradores, gestión de usuarios, edificios y control de inventario global." : "Manual para docentes y personal administrativo, consulta de activos y solicitudes de baja."}\n\nFecha de emisión: Marzo 2026`;
+    const contenido = `GUÍA DE ${id.toUpperCase()}\n------------------\n${guia.titulo}\n\nDescripción: ${guia.descripcion || "Manual oficial de usuario."}\n\nSistema Indeltario 2026`;
     const element = document.createElement("a");
     const file = new Blob([contenido], {type: 'text/plain'});
     element.href = URL.createObjectURL(file);
@@ -74,6 +87,20 @@ export default function Recursos() {
     }
   }, [activeTab]);
 
+  const toggleSeleccion = (activo) => {
+    const existe = seleccionados.find(s => s.idActivo === activo.idActivo);
+    if (existe) {
+      setSeleccionados(seleccionados.filter(s => s.idActivo !== activo.idActivo));
+    } else {
+      setSeleccionados([...seleccionados, activo]);
+    }
+  };
+
+  const seleccionarTodosFiltrados = () => {
+    const nuevos = filtrados.filter(f => !seleccionados.some(s => s.idActivo === f.idActivo));
+    setSeleccionados([...seleccionados, ...nuevos]);
+  };
+
   const filtrados = useMemo(() => {
     const q = busqueda.toLowerCase();
     return activos.filter(a => (a.nombre || "").toLowerCase().includes(q) || (a.marbete || "").includes(q));
@@ -85,8 +112,8 @@ export default function Recursos() {
       {/* BANNER */}
       <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-emerald-700 to-teal-900 p-10 text-white shadow-2xl">
         <div className="relative z-10 max-w-2xl">
-          <h1 className="text-4xl font-black tracking-tighter mb-4 italic uppercase">Recursos y Soporte</h1>
-          <p className="text-emerald-100 text-lg font-medium">Manuales de ayuda y herramientas de etiquetado.</p>
+          <h1 className="text-4xl font-black tracking-tighter mb-4 italic uppercase">Recursos e Impresión</h1>
+          <p className="text-emerald-100 text-lg font-medium">Acceso a manuales y generación de marbetes institucionales.</p>
         </div>
         <Library className="absolute right-[-20px] bottom-[-20px] text-white/10" size={240} />
       </div>
@@ -94,81 +121,89 @@ export default function Recursos() {
       {/* TABS */}
       <div className="flex p-1.5 bg-white border border-emerald-100 rounded-3xl w-fit shadow-sm">
         {["guias", "marbetes"].map((t) => (
-          <button 
-            key={t}
-            onClick={() => setActiveTab(t)}
-            className={`flex items-center gap-2 px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === t ? 'bg-emerald-600 text-white shadow-lg' : 'text-gray-400 hover:text-emerald-600'}`}
-          >
-            {t === 'guias' ? <BookOpen size={16}/> : <Printer size={16}/>} {t === 'guias' ? 'Guías Rápidas' : 'Marbetes'}
+          <button key={t} onClick={() => setActiveTab(t)} className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === t ? 'bg-emerald-600 text-white shadow-lg' : 'text-gray-400'}`}>
+            {t === 'guias' ? 'Manuales' : 'Etiquetas'}
           </button>
         ))}
       </div>
 
       {activeTab === "guias" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {[
-            { id: 'admin', icon: ShieldCheck, title: 'Administrador' },
-            { id: 'usuario', icon: BookOpen, title: 'Usuario/Docente' }
-          ].map((card) => (
-            <div key={card.id} className="bg-white rounded-[2.5rem] p-8 border border-emerald-100 shadow-sm hover:shadow-xl transition-all group">
-              <div className={`w-14 h-14 rounded-2xl mb-6 flex items-center justify-center transition-transform group-hover:scale-110 ${card.id === 'admin' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'}`}>
-                <card.icon size={32} />
+          {['admin', 'usuario'].map((id) => (
+            <div key={id} className="bg-white rounded-[2.5rem] p-8 border border-emerald-100 shadow-sm hover:shadow-xl transition-all group">
+              <div className={`w-14 h-14 rounded-2xl mb-6 flex items-center justify-center ${id === 'admin' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                {id === 'admin' ? <ShieldCheck size={32}/> : <BookOpen size={32}/>}
               </div>
-              
-              <h3 className="text-2xl font-black text-slate-800 uppercase italic">Guía {card.title}</h3>
-              
-              {/* TEXTO EN GRIS (Caption que pediste) */}
-              <p className="text-gray-400 text-xs font-medium mt-2 leading-relaxed">
-                {card.id === 'admin' 
-                  ? "Manual para administradores, gestión de usuarios, edificios y control de inventario global."
-                  : "Manual para docentes y personal administrativo, consulta de activos y solicitudes de baja."}
+              <h3 className="text-2xl font-black text-slate-800 uppercase italic">Guía {id === 'admin' ? 'Administrador' : 'Usuario'}</h3>
+              <p className="text-gray-400 text-[11px] font-bold mt-2 uppercase tracking-tight">
+                {id === 'admin' ? "Gestión de usuarios, edificios e inventario global." : "Consulta de activos y reportes de baja para personal."}
               </p>
-
               <div className="flex gap-3 mt-8">
-                <button 
-                  onClick={() => setGuiaAbierta(card.id)} 
-                  className={`flex-1 py-4 text-white rounded-2xl font-black text-[10px] uppercase transition-colors ${card.id === 'admin' ? 'bg-slate-900 hover:bg-blue-600' : 'bg-slate-900 hover:bg-emerald-600'}`}
-                >
-                  Leer Ahora
-                </button>
-                <button 
-                  onClick={() => descargarGuia(card.id)}
-                  className="p-4 bg-gray-50 text-gray-400 rounded-2xl hover:bg-emerald-600 hover:text-white transition-all"
-                >
-                  <Download size={20}/>
+                <button onClick={() => setGuiaAbierta(id)} className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase hover:bg-emerald-600 transition-colors shadow-md">Leer Ahora</button>
+                {/* BOTÓN DE DESCARGAR RECUPERADO */}
+                <button onClick={() => descargarGuia(id)} className="p-4 bg-gray-50 text-gray-400 rounded-2xl hover:bg-slate-900 hover:text-white transition-all shadow-sm">
+                   <Download size={20}/>
                 </button>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        /* GENERADOR DE MARBETES */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-emerald-100 shadow-sm">
-            <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600" size={22} />
-              <input type="text" placeholder="Buscar activo..." className="w-full pl-14 pr-6 py-5 bg-emerald-50/30 border-none rounded-2xl text-sm font-bold outline-none" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}/>
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600" size={20} />
+                <input type="text" placeholder="Buscar por nombre o marbete..." className="w-full pl-12 pr-6 py-4 bg-emerald-50/50 rounded-2xl text-sm font-bold outline-none" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}/>
+              </div>
+              <button onClick={seleccionarTodosFiltrados} className="flex items-center justify-center gap-2 px-6 py-4 bg-emerald-50 text-emerald-700 rounded-2xl font-black text-[10px] uppercase hover:bg-emerald-100 transition-all">
+                <ListChecks size={18}/> Seleccionar Todos
+              </button>
             </div>
-            <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-              {loading ? <Loader2 className="animate-spin mx-auto text-emerald-600" /> : filtrados.map(act => (
-                <div key={act.idActivo} onClick={() => setActivoSeleccionado(act)} className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all cursor-pointer ${activoSeleccionado?.idActivo === act.idActivo ? 'border-emerald-500 bg-emerald-50' : 'border-transparent bg-gray-50 hover:border-emerald-200'}`}>
-                  <div><p className="text-[10px] font-black text-emerald-700 uppercase italic">{act.marbete}</p><h4 className="text-sm font-bold text-slate-800">{act.nombre}</h4></div>
-                  <ChevronRight size={18} className={activoSeleccionado?.idActivo === act.idActivo ? 'text-emerald-600' : 'text-gray-300'} />
-                </div>
-              ))}
+            
+            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+              {loading ? <Loader2 className="animate-spin mx-auto text-emerald-600" /> : filtrados.map(act => {
+                const isSelected = seleccionados.some(s => s.idActivo === act.idActivo);
+                return (
+                  <div key={act.idActivo} onClick={() => toggleSeleccion(act)} className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all cursor-pointer ${isSelected ? 'border-emerald-500 bg-emerald-50 shadow-sm' : 'border-transparent bg-gray-50'}`}>
+                    {isSelected ? <CheckSquare className="text-emerald-600" /> : <Square className="text-gray-300" />}
+                    <div>
+                      <p className="text-[10px] font-black text-emerald-700 uppercase italic leading-none mb-1">{act.marbete}</p>
+                      <h4 className="text-sm font-bold text-slate-800 uppercase leading-none">{act.nombre}</h4>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-          <div className="flex flex-col gap-6">
-            <div className="bg-white p-10 rounded-[2.5rem] border border-emerald-100 shadow-xl flex justify-center">
-              {activoSeleccionado ? (
-                <div className="w-40 h-60 border-2 border-slate-900 rounded-xl p-4 flex flex-col items-center justify-between shadow-2xl animate-in zoom-in-50">
-                  <div className="text-center"><img src={logoUtn} className="w-10 h-10 mx-auto mb-1"/><p className="text-[5px] font-black uppercase italic">UTN</p></div>
-                  <p className="text-[8px] font-black text-center uppercase leading-tight">{activoSeleccionado.nombre}</p>
-                  <div className="w-full h-8 bg-slate-900"></div>
-                </div>
-              ) : <div className="w-40 h-60 border-2 border-dashed border-gray-100 rounded-2xl flex items-center justify-center text-gray-200"><Printer size={48}/></div>}
+
+          <div className="space-y-6">
+            <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl flex flex-col h-full">
+              <div className="flex justify-between items-center mb-6">
+                <h4 className="font-black uppercase italic text-sm tracking-widest text-emerald-400">Cola de Impresión</h4>
+                <span className="bg-emerald-500 text-slate-900 text-[10px] px-3 py-1 rounded-full font-black">{seleccionados.length}</span>
+              </div>
+              
+              <div className="space-y-3 flex-grow max-h-80 overflow-y-auto mb-6 pr-2 custom-scrollbar">
+                {seleccionados.length === 0 ? (
+                  <div className="text-center py-10 opacity-20"><Printer size={48} className="mx-auto mb-2"/><p className="text-[9px] font-black uppercase tracking-widest">Lista vacía</p></div>
+                ) : seleccionados.map(s => (
+                  <div key={s.idActivo} className="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/10 group">
+                    <span className="text-[9px] font-bold truncate pr-2 uppercase">{s.nombre}</span>
+                    <button onClick={(e) => { e.stopPropagation(); toggleSeleccion(s); }} className="text-slate-500 hover:text-red-400 transition-colors"><Trash2 size={14}/></button>
+                  </div>
+                ))}
+              </div>
+
+              {seleccionados.length > 0 && (
+                <button onClick={() => setIsModalPDF(true)} className="w-full py-5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-3xl font-black text-xs uppercase shadow-lg transition-all flex items-center justify-center gap-3">
+                  <Printer size={20}/> Generar PDF ({seleccionados.length})
+                </button>
+              )}
             </div>
-            {activoSeleccionado && <button onClick={() => setIsModalPDF(true)} className="w-full py-5 bg-emerald-600 text-white rounded-3xl font-black text-xs uppercase shadow-xl hover:bg-emerald-700 transition-all flex items-center justify-center gap-3"><Eye size={20}/> Ver para Imprimir</button>}
+            {seleccionados.length > 0 && (
+              <button onClick={() => setSeleccionados([])} className="w-full text-slate-400 hover:text-red-500 text-[10px] font-black uppercase tracking-widest transition-all">Limpiar Selección</button>
+            )}
           </div>
         </div>
       )}
@@ -176,33 +211,29 @@ export default function Recursos() {
       {/* LECTOR LATERAL */}
       {guiaAbierta && (
         <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex justify-end">
-          <div className="bg-white w-full max-w-xl h-full shadow-2xl animate-in slide-in-from-right p-8 overflow-y-auto">
+          <div className="bg-white w-full max-w-xl h-full p-8 overflow-y-auto animate-in slide-in-from-right">
             <div className="flex justify-between items-center mb-10 border-b pb-6">
-              <div className="flex items-center gap-3">
-                <div className={`p-3 rounded-2xl shadow-lg text-white ${guiaAbierta === 'admin' ? 'bg-blue-600' : 'bg-emerald-600'}`}>
-                   {guiaAbierta === 'admin' ? <ShieldCheck /> : <BookOpen />}
-                </div>
-                <div>
-                  <h2 className="text-xl font-black text-slate-800 uppercase italic">{GuiasData[guiaAbierta].titulo}</h2>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{GuiasData[guiaAbierta].subtitulo}</p>
-                </div>
-              </div>
+              <h2 className="text-xl font-black text-slate-800 uppercase italic">Manual {guiaAbierta}</h2>
               <button onClick={() => setGuiaAbierta(null)} className="p-2 bg-gray-100 rounded-full hover:bg-red-500 hover:text-white transition-all"><X /></button>
             </div>
-            {GuiasData[guiaAbierta].content}
+            <div className="prose prose-slate max-w-none">{GuiasData[guiaAbierta].content}</div>
           </div>
         </div>
       )}
 
-      {/* MODAL PDF */}
+      {/* MODAL PDF MÚLTIPLE */}
       {isModalPDF && (
         <div className="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-4xl h-[90vh] rounded-[2rem] overflow-hidden flex flex-col">
-            <div className="p-6 border-b flex justify-between items-center bg-white">
-              <p className="font-black text-xs uppercase tracking-widest text-emerald-700 italic">Previsualización de Impresión</p>
-              <button onClick={() => setIsModalPDF(false)} className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white p-2 rounded-full transition-all"><X/></button>
+          <div className="bg-white w-full max-w-5xl h-[90vh] rounded-[2.5rem] overflow-hidden flex flex-col">
+            <div className="p-6 border-b flex justify-between items-center">
+              <p className="font-black text-xs uppercase italic text-emerald-700 tracking-widest">Etiquetas Oficiales UTN - Formato A4</p>
+              <button onClick={() => setIsModalPDF(false)} className="bg-red-50 text-red-500 p-2 rounded-full hover:bg-red-500 hover:text-white transition-all"><X/></button>
             </div>
-            <div className="flex-1"><PDFViewer width="100%" height="100%" className="border-none"><MarbetePDF activo={activoSeleccionado}/></PDFViewer></div>
+            <div className="flex-1 bg-slate-100 p-4">
+               <PDFViewer width="100%" height="100%" className="border-none rounded-2xl overflow-hidden shadow-2xl">
+                  <MarbetesMultiplesPDF seleccionados={seleccionados}/>
+               </PDFViewer>
+            </div>
           </div>
         </div>
       )}
