@@ -65,5 +65,12 @@ export const sections = [
     label: "Encargados", 
     icon: <ShieldUser size={20} />,
     roles: ["Administrador"] 
+  },
+  { 
+    key: "Mis Encargos", 
+    label: "Mis encargos", 
+    icon: <ShieldUser size={20} />,
+    roles: ["Administrador, Encargado", "Docente"] 
   }
+
 ];

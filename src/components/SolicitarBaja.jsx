@@ -604,4 +604,3 @@ const Input = ({ label, onChange, ...props }) => (
 const LoaderIcon = () => (
     <div className="w-10 h-10 border-4 border-emerald-100 border-t-[#059669] rounded-full animate-spin"></div>
 );
-

@@ -44,6 +44,13 @@ export default function Sidebar({ setView, currentView, onLogout }) {
           active={currentView === "usuarios"}
           onClick={() => setView("usuarios")}
         />
+
+        <Item
+          label="Mis Encargos"
+          icon={<Users size={20} />}
+          active={currentView === "Mis Encargos"}
+          onClick={() => setView("Mis Encargos")}
+        />
       </nav>
 
       <div className="p-3 border-t">

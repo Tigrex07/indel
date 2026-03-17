@@ -12,6 +12,7 @@ const sections = [
   { key: "solicitar-baja", label: "Solicitar Movimiento", icon: <FileText size={20}/>, roles: ["Administrador", "Soporte", "Docente"] },
   { key: "recursos", label: "Recursos", icon: <Download size={20}/>, roles: ["Administrador", "Soporte", "Docente"] },
   { key: "encargados", label: "Encargados", icon: <User size={20}/>, roles: ["Administrador"] },
+  { key: "Mis Encargos", label: "Mis Encargos", icon: <ClipboardList size={20}/>, roles: ["Administrador", "Soporte", "Docente"] },
 ];
 
 export default function Sidebar({ activeSection, setActiveSection, username, userRole, onLogout }) {

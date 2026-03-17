@@ -1,5 +1,5 @@
 import Usuario from "../components/Usuarios.jsx";
-import DashboardHome from "../components/Dashboardhome.jsx";
+import DashboardHome from "../components/DashboardHome.jsx";
 import ActivosSection from "../components/ActivosSection.jsx";
 import ActivosGrupo from "../components/ActivosGrupo.jsx";
 import Bajas from "../components/Bajas.jsx";
@@ -11,10 +11,11 @@ import SolicitarBaja from "../components/SolicitarBaja.jsx";
 import Encargados from "../pages/Encargados.jsx";
 import Recursos from "../components/Recursos.jsx";
 import Transferencias from "../pages/Transferencias.jsx";
-
+import MisEncargos from "../components/MisEncargos.jsx";
 export default function SectionRenderer({
   section,
   role, // Viene de Dashboard.jsx
+  username,
   grupoSeleccionado,
   onOpenCategory,
   edificioSeleccionado,
@@ -24,10 +25,10 @@ export default function SectionRenderer({
 }) {
 
   const permisos = {
-    "Administrador": ["dashboard", "usuarios", "encargados", "activos", "edificios", "transferencias", "bajas", "recursos", "reportes", "solicitar-baja"], // <-- AÑADIDO AQUÍ
+    "Administrador": ["dashboard", "usuarios", "encargados", "activos", "edificios", "transferencias", "bajas", "recursos", "reportes", "solicitar-baja", "Mis Encargos"], // <-- AÑADIDO AQUÍ
     "Soporte": ["dashboard", "activos", "edificios", "transferencias", "bajas", "recursos", "reportes", "solicitar-baja"], // <-- AÑADIDO AQUÍ TAMBIÉN
-    "Docente": ["solicitar-baja", "recursos"],
-    "Encargado": ["solicitar-baja", "recursos"]
+    "Docente": ["solicitar-baja", "recursos", "Mis Encargos"],
+    "Encargado": ["solicitar-baja", "recursos", "Mis Encargos"]
   };
 
   // 2. Validación de seguridad
@@ -71,6 +72,11 @@ export default function SectionRenderer({
     
     case "solicitar-baja":
       return <SolicitarBaja />;
+
+    
+case "Mis Encargos":
+    // Ahora sí, le pasamos el nombre real al componente
+    return <MisEncargos nombreUsuario={username} userRole={role} />;
 
     case "activos":
       // Si seleccionamos un grupo (ej. Escritorios), mostramos el inventario de ese grupo

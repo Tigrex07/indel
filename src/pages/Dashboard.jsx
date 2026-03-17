@@ -21,6 +21,7 @@ export default function Dashboard({ onLogout }) {
           setUsername(j.usuario.nombre);
           // Guardamos el rol tal cual viene (Administrador, Soporte, etc.)
           setRole(j.usuario.rol); 
+          localStorage.setItem("sesion_activa", JSON.stringify(j.usuario));
         }
       })
       .catch(err => console.error("Error al obtener datos del usuario:", err));
