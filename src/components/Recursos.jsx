@@ -2,17 +2,17 @@ import React, { useState, useEffect, useMemo } from "react";
 import { 
   BookOpen, Printer, Download, Search, 
   ShieldCheck, Eye, X, ChevronRight, Library, 
-  Loader2, CheckCircle2, Info, Square, CheckSquare, Trash2, ListChecks
+  Loader2, CheckCircle2, Info, Square, CheckSquare, Trash2, ListChecks,
+  ChevronLeft
 } from "lucide-react";
 import { PDFViewer, Document, Page, View, Text, Image, StyleSheet } from '@react-pdf/renderer';
-
-// Importación de datos y recursos
 import { GuiasData } from "../data/GuiasData";
 import logoUtn from '../assets/utn.png'; 
 
 const API_URL = "https://corporacionperris.com/backend/api/inventario.php";
+const ITEMS_PER_PAGE = 10; 
 
-// --- ESTILOS PDF (Diseño de la foto) ---
+// --- ESTILOS PDF CORREGIDOS ---
 const pdfStyles = StyleSheet.create({
   page: { padding: 20, backgroundColor: '#fff', flexDirection: 'row', flexWrap: 'wrap', gap: 15 },
   card: { width: 250, height: 120, padding: 10, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#000' },
@@ -27,11 +27,12 @@ const pdfStyles = StyleSheet.create({
   textFooter: { fontSize: 5.5, fontWeight: 'bold', textTransform: 'uppercase' }
 });
 
+// --- COMPONENTE PDF REPARADO ---
 const MarbetesMultiplesPDF = ({ seleccionados }) => (
   <Document>
     <Page size="A4" style={pdfStyles.page}>
       {seleccionados.map((activo, index) => (
-        <View key={index} style={pdfStyles.card}>
+        <View key={index} style={pdfStyles.card} wrap={false}>
           <View style={pdfStyles.logoContainer}>
             <Image src={logoUtn} style={pdfStyles.logo} />
             <Text style={pdfStyles.slogan}>OPCIÓN CON FUTURO</Text>
@@ -39,10 +40,11 @@ const MarbetesMultiplesPDF = ({ seleccionados }) => (
           <View style={pdfStyles.infoContainer}>
             <Text style={pdfStyles.textMain}>UNIVERSIDAD TECNOLÓGICA DE NOGALES</Text>
             <Text style={pdfStyles.textSecondary}>FECHA: {activo.fecha || "MARZO 2026"}</Text>
-            <Text style={pdfStyles.marbeteGrande}>{activo.marbete}</Text>
-            <Text style={pdfStyles.textMain}>{activo.ubicacion || "AULA No. 12, DOC. II"}</Text>
+            <Text style={pdfStyles.marbeteGrande}>{activo.marbete || "S/M"}</Text>
+            <Text style={pdfStyles.textMain}>{activo.edificio} - {activo.aula || "S/U"}</Text>
             <View style={pdfStyles.footerRow}>
-              <Text style={pdfStyles.textFooter}>{activo.nombre}</Text>
+              {/* Aquí se corrigió la referencia de pdfFooter a pdfStyles */}
+              <Text style={pdfStyles.textFooter}>{activo.nombre?.substring(0, 25)}</Text>
               <Text style={pdfStyles.textFooter}>{activo.serie || "S/N"}</Text>
             </View>
           </View>
@@ -60,8 +62,8 @@ export default function Recursos() {
   const [seleccionados, setSeleccionados] = useState([]);
   const [guiaAbierta, setGuiaAbierta] = useState(null);
   const [isModalPDF, setIsModalPDF] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // Función para descargar guías (Vuelve a estar aquí)
   const descargarGuia = (id) => {
     const guia = GuiasData[id];
     const contenido = `GUÍA DE ${id.toUpperCase()}\n------------------\n${guia.titulo}\n\nDescripción: ${guia.descripcion || "Manual oficial de usuario."}\n\nSistema Indeltario 2026`;
@@ -87,6 +89,10 @@ export default function Recursos() {
     }
   }, [activeTab]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [busqueda]);
+
   const toggleSeleccion = (activo) => {
     const existe = seleccionados.find(s => s.idActivo === activo.idActivo);
     if (existe) {
@@ -103,8 +109,17 @@ export default function Recursos() {
 
   const filtrados = useMemo(() => {
     const q = busqueda.toLowerCase();
-    return activos.filter(a => (a.nombre || "").toLowerCase().includes(q) || (a.marbete || "").includes(q));
+    return activos.filter(a => 
+      (a.nombre || "").toLowerCase().includes(q) || 
+      (a.marbete || "").toLowerCase().includes(q)
+    );
   }, [busqueda, activos]);
+
+  const totalPages = Math.ceil(filtrados.length / ITEMS_PER_PAGE);
+  const paginatedItems = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filtrados.slice(start, start + ITEMS_PER_PAGE);
+  }, [filtrados, currentPage]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -140,7 +155,6 @@ export default function Recursos() {
               </p>
               <div className="flex gap-3 mt-8">
                 <button onClick={() => setGuiaAbierta(id)} className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase hover:bg-emerald-600 transition-colors shadow-md">Leer Ahora</button>
-                {/* BOTÓN DE DESCARGAR RECUPERADO */}
                 <button onClick={() => descargarGuia(id)} className="p-4 bg-gray-50 text-gray-400 rounded-2xl hover:bg-slate-900 hover:text-white transition-all shadow-sm">
                    <Download size={20}/>
                 </button>
@@ -150,19 +164,22 @@ export default function Recursos() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-emerald-100 shadow-sm">
+          {/* LISTA DE ACTIVOS */}
+          <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-emerald-100 shadow-sm flex flex-col">
             <div className="flex flex-col md:flex-row gap-4 mb-6">
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600" size={20} />
                 <input type="text" placeholder="Buscar por nombre o marbete..." className="w-full pl-12 pr-6 py-4 bg-emerald-50/50 rounded-2xl text-sm font-bold outline-none" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}/>
               </div>
               <button onClick={seleccionarTodosFiltrados} className="flex items-center justify-center gap-2 px-6 py-4 bg-emerald-50 text-emerald-700 rounded-2xl font-black text-[10px] uppercase hover:bg-emerald-100 transition-all">
-                <ListChecks size={18}/> Seleccionar Todos
+                <ListChecks size={18}/> Seleccionar {filtrados.length}
               </button>
             </div>
             
-            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-              {loading ? <Loader2 className="animate-spin mx-auto text-emerald-600" /> : filtrados.map(act => {
+            <div className="space-y-2 flex-grow min-h-[400px]">
+              {loading ? (
+                <div className="flex justify-center py-20"><Loader2 className="animate-spin text-emerald-600" size={40} /></div>
+              ) : paginatedItems.map(act => {
                 const isSelected = seleccionados.some(s => s.idActivo === act.idActivo);
                 return (
                   <div key={act.idActivo} onClick={() => toggleSeleccion(act)} className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all cursor-pointer ${isSelected ? 'border-emerald-500 bg-emerald-50 shadow-sm' : 'border-transparent bg-gray-50'}`}>
@@ -175,8 +192,26 @@ export default function Recursos() {
                 );
               })}
             </div>
+
+            {/* PAGINACIÓN */}
+            {!loading && totalPages > 1 && (
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  Página {currentPage} de {totalPages}
+                </p>
+                <div className="flex gap-2">
+                  <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="p-3 bg-gray-100 rounded-xl disabled:opacity-30 hover:bg-emerald-600 hover:text-white transition-all">
+                    <ChevronLeft size={18} />
+                  </button>
+                  <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="p-3 bg-gray-100 rounded-xl disabled:opacity-30 hover:bg-emerald-600 hover:text-white transition-all">
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
+          {/* COLA DE IMPRESIÓN */}
           <div className="space-y-6">
             <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl flex flex-col h-full">
               <div className="flex justify-between items-center mb-6">
@@ -208,7 +243,7 @@ export default function Recursos() {
         </div>
       )}
 
-      {/* LECTOR LATERAL */}
+      {/* MODALES */}
       {guiaAbierta && (
         <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex justify-end">
           <div className="bg-white w-full max-w-xl h-full p-8 overflow-y-auto animate-in slide-in-from-right">
@@ -221,7 +256,6 @@ export default function Recursos() {
         </div>
       )}
 
-      {/* MODAL PDF MÚLTIPLE */}
       {isModalPDF && (
         <div className="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-5xl h-[90vh] rounded-[2.5rem] overflow-hidden flex flex-col">
