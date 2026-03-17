@@ -5,29 +5,56 @@ import {
   Loader2, CheckCircle2, Info, Square, CheckSquare, Trash2, ListChecks,
   ChevronLeft
 } from "lucide-react";
-import { PDFViewer, Document, Page, View, Text, Image, StyleSheet } from '@react-pdf/renderer';
+// Importamos pdf
+import { PDFViewer, Document, Page, View, Text, Image, StyleSheet, pdf } from '@react-pdf/renderer';
 import { GuiasData } from "../data/GuiasData";
+import { GuiaPDF } from "../components/GuiaPDF"; 
 import logoUtn from '../assets/utn.png'; 
 
 const API_URL = "https://corporacionperris.com/backend/api/inventario.php";
 const ITEMS_PER_PAGE = 10; 
 
-// --- ESTILOS PDF CORREGIDOS ---
+// --- CORRECCIÓN DE ESTILOS PARA EVITAR "Invalid border style" ---
 const pdfStyles = StyleSheet.create({
   page: { padding: 20, backgroundColor: '#fff', flexDirection: 'row', flexWrap: 'wrap', gap: 15 },
-  card: { width: 250, height: 120, padding: 10, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#000' },
-  logoContainer: { width: '28%', alignItems: 'center', justifyContent: 'center', borderRightWidth: 1, borderRightColor: '#000', paddingRight: 5, height: '90%' },
+  card: { 
+    width: 250, 
+    height: 120, 
+    padding: 10, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    borderWidth: 1, 
+    borderStyle: 'solid', // Especificamos el estilo explícitamente
+    borderColor: '#000' 
+  },
+  logoContainer: { 
+    width: '28%', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    borderRightWidth: 1, 
+    borderRightStyle: 'solid', 
+    borderRightColor: '#000', 
+    paddingRight: 5, 
+    height: '90%' 
+  },
   logo: { width: 32, height: 32 },
   slogan: { fontSize: 4, marginTop: 4, fontWeight: 'black', textAlign: 'center' },
   infoContainer: { width: '72%', paddingLeft: 8, justifyContent: 'center' },
   textMain: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', marginBottom: 2 },
   textSecondary: { fontSize: 6, marginBottom: 1, textTransform: 'uppercase' },
   marbeteGrande: { fontSize: 13, fontWeight: 'bold', marginVertical: 2 },
-  footerRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4, borderTopWidth: 0.5, borderTopColor: '#000', paddingTop: 3 },
+  footerRow: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    marginTop: 4, 
+    borderTopWidth: 0.5, 
+    borderTopStyle: 'solid', 
+    borderTopColor: '#000', 
+    paddingTop: 3 
+  },
   textFooter: { fontSize: 5.5, fontWeight: 'bold', textTransform: 'uppercase' }
 });
 
-// --- COMPONENTE PDF REPARADO ---
 const MarbetesMultiplesPDF = ({ seleccionados }) => (
   <Document>
     <Page size="A4" style={pdfStyles.page}>
@@ -43,7 +70,6 @@ const MarbetesMultiplesPDF = ({ seleccionados }) => (
             <Text style={pdfStyles.marbeteGrande}>{activo.marbete || "S/M"}</Text>
             <Text style={pdfStyles.textMain}>{activo.edificio} - {activo.aula || "S/U"}</Text>
             <View style={pdfStyles.footerRow}>
-              {/* Aquí se corrigió la referencia de pdfFooter a pdfStyles */}
               <Text style={pdfStyles.textFooter}>{activo.nombre?.substring(0, 25)}</Text>
               <Text style={pdfStyles.textFooter}>{activo.serie || "S/N"}</Text>
             </View>
@@ -64,15 +90,37 @@ export default function Recursos() {
   const [isModalPDF, setIsModalPDF] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const descargarGuia = (id) => {
+  // --- FUNCIÓN DE DESCARGA REVISADA ---
+  const descargarGuia = async (id) => {
     const guia = GuiasData[id];
-    const contenido = `GUÍA DE ${id.toUpperCase()}\n------------------\n${guia.titulo}\n\nDescripción: ${guia.descripcion || "Manual oficial de usuario."}\n\nSistema Indeltario 2026`;
-    const element = document.createElement("a");
-    const file = new Blob([contenido], {type: 'text/plain'});
-    element.href = URL.createObjectURL(file);
-    element.download = `Manual_${id}_UTN.txt`;
-    document.body.appendChild(element);
-    element.click();
+    if (!guia) return;
+
+    try {
+      // Creamos la instancia del documento
+      const doc = <GuiaPDF id={id} data={guia} />;
+      
+      // .toBlob() es lo que genera el archivo real
+      const blob = await pdf(doc).toBlob();
+      
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Manual_${id}_UTN.pdf`;
+      
+      document.body.appendChild(link);
+      link.click();
+      
+      // Limpieza necesaria para no saturar la memoria
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 100);
+
+    } catch (error) {
+      console.error("Error al descargar:", error);
+      // Si el error persiste, revisa que GuiaPDF no tenga bordes mal definidos
+      alert("Error al generar el PDF. Verifica los estilos de GuiaPDF.");
+    }
   };
 
   useEffect(() => {
@@ -163,8 +211,8 @@ export default function Recursos() {
           ))}
         </div>
       ) : (
+        /* ... resto de marbetes igual ... */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* LISTA DE ACTIVOS */}
           <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-emerald-100 shadow-sm flex flex-col">
             <div className="flex flex-col md:flex-row gap-4 mb-6">
               <div className="relative flex-1">
@@ -192,26 +240,8 @@ export default function Recursos() {
                 );
               })}
             </div>
-
-            {/* PAGINACIÓN */}
-            {!loading && totalPages > 1 && (
-              <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                  Página {currentPage} de {totalPages}
-                </p>
-                <div className="flex gap-2">
-                  <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="p-3 bg-gray-100 rounded-xl disabled:opacity-30 hover:bg-emerald-600 hover:text-white transition-all">
-                    <ChevronLeft size={18} />
-                  </button>
-                  <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="p-3 bg-gray-100 rounded-xl disabled:opacity-30 hover:bg-emerald-600 hover:text-white transition-all">
-                    <ChevronRight size={18} />
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
-
-          {/* COLA DE IMPRESIÓN */}
+          
           <div className="space-y-6">
             <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl flex flex-col h-full">
               <div className="flex justify-between items-center mb-6">
@@ -236,14 +266,11 @@ export default function Recursos() {
                 </button>
               )}
             </div>
-            {seleccionados.length > 0 && (
-              <button onClick={() => setSeleccionados([])} className="w-full text-slate-400 hover:text-red-500 text-[10px] font-black uppercase tracking-widest transition-all">Limpiar Selección</button>
-            )}
           </div>
         </div>
       )}
 
-      {/* MODALES */}
+      {/* MODAL LECTOR ONLINE */}
       {guiaAbierta && (
         <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex justify-end">
           <div className="bg-white w-full max-w-xl h-full p-8 overflow-y-auto animate-in slide-in-from-right">
@@ -256,6 +283,7 @@ export default function Recursos() {
         </div>
       )}
 
+      {/* MODAL PDF MÚLTIPLE */}
       {isModalPDF && (
         <div className="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-5xl h-[90vh] rounded-[2.5rem] overflow-hidden flex flex-col">
