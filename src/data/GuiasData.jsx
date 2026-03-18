@@ -1,159 +1,156 @@
 import React from 'react';
-import { Search, Copy, CheckCircle2, Printer, ShieldCheck, Info } from "lucide-react";
+import { 
+  Search, Copy, CheckCircle2, Printer, 
+  ShieldCheck, Info, AlertTriangle, 
+  FileText, Users, Box, RefreshCw, Layout 
+} from "lucide-react";
 
 export const GuiasData = {
   usuario: {
-    titulo: "Manual de Usuario",
-    subtitulo: "Personal Docente y Administrativo",
-    color: "emerald", // Esto define el color del icono en el lector
+    titulo: "Manual Maestro de Usuario",
+    subtitulo: "Gestión de Activos para Personal Docente y Administrativo",
+    color: "emerald",
     content: (
-      <div className="space-y-10 p-2 pb-10">
-        <section className="relative p-6 bg-emerald-50 rounded-[2rem] border border-emerald-100 overflow-hidden">
+      <div className="space-y-12 p-2 pb-10">
+        {/* INTRODUCCIÓN */}
+        <section className="relative p-8 bg-emerald-50 rounded-[2.5rem] border border-emerald-100 overflow-hidden">
           <div className="relative z-10">
-            <h4 className="text-lg font-black text-emerald-800 flex items-center gap-2 mb-2 uppercase italic">Bienvenido</h4>
-            <p className="text-sm text-emerald-700/80 leading-relaxed font-medium">
-              Esta herramienta permite gestionar tus activos de forma transparente.
+            <h4 className="text-xl font-black text-emerald-800 flex items-center gap-2 mb-3 uppercase italic">Protocolo de Resguardo Institucional</h4>
+            <p className="text-sm text-emerald-700/90 leading-relaxed font-medium max-w-2xl">
+              Bienvenido al sistema de control patrimonial. Este manual tiene como objetivo guiarte en el uso correcto de la plataforma para asegurar que los activos asignados a tu nombre estén siempre actualizados y localizables. Recuerda que la veracidad de la información aquí vertida es fundamental para las auditorías institucionales.
             </p>
           </div>
-          <CheckCircle2 size={120} className="absolute top-[-20px] right-[-20px] text-emerald-200/50" />
+          <CheckCircle2 size={140} className="absolute top-[-30px] right-[-30px] text-emerald-200/40" />
         </section>
 
-        <section>
-          <div className="flex items-center gap-3 mb-4">
-            <span className="bg-slate-900 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs font-black">01</span>
-            <h4 className="text-xl font-black text-slate-800 uppercase italic tracking-tighter">Panel Principal</h4>
+        {/* SECCIÓN 1: VISUALIZACIÓN */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-emerald-600 text-white rounded-2xl flex items-center justify-center font-black shadow-lg shadow-emerald-200">01</div>
+            <h4 className="text-xl font-black text-slate-800 uppercase italic">Control de Inventario Personal</h4>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-5 border-2 border-gray-50 rounded-2xl bg-white">
-              <Search size={20} className="text-emerald-600 mb-4" />
-              <p className="font-bold text-sm text-slate-800 mb-1">Búsqueda</p>
-              <p className="text-xs text-gray-500 font-medium">Encuentra equipos por nombre o marbete al instante.</p>
+          <p className="text-sm text-slate-600 leading-relaxed pl-1">
+            Desde tu panel principal, puedes visualizar en tiempo real todos los activos vinculados a tu número de empleado. Cada registro contiene información crítica:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-1">
+            <div className="p-5 bg-white border border-slate-100 rounded-3xl shadow-sm">
+              <h5 className="font-black text-xs text-emerald-600 uppercase mb-2 tracking-widest">Búsqueda Inteligente</h5>
+              <p className="text-xs text-slate-500 leading-relaxed">Usa el buscador para filtrar por marca (ej. Dell), tipo de equipo o ubicación. Esto es vital cuando manejas más de 20 activos simultáneamente.</p>
             </div>
-            <div className="p-5 border-2 border-gray-50 rounded-2xl bg-white">
-              <Copy size={20} className="text-emerald-600 mb-4" />
-              <p className="font-bold text-sm text-slate-800 mb-1">Copiado rápido</p>
-              <p className="text-xs text-gray-500 font-medium">Usa el botón de copia para llevar el marbete a tus oficios.</p>
+            <div className="p-5 bg-white border border-slate-100 rounded-3xl shadow-sm">
+              <h5 className="font-black text-xs text-emerald-600 uppercase mb-2 tracking-widest">Copiado de Datos</h5>
+              <p className="text-xs text-slate-500 leading-relaxed">Al hacer clic en el icono de copiar junto al marbete, el sistema guarda el código en tu portapapeles. Úsalo para llenar oficios externos sin errores de dedo.</p>
             </div>
           </div>
         </section>
 
-        <section>
-          <div className="flex items-center gap-3 mb-4">
-            <span className="bg-slate-900 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs font-black">02</span>
-            <h4 className="text-xl font-black text-slate-800 uppercase italic tracking-tighter">Bajas Técnicas</h4>
+        {/* SECCIÓN 2: PROCESO DE BAJA */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-slate-900 text-white rounded-2xl flex items-center justify-center font-black">02</div>
+            <h4 className="text-xl font-black text-slate-800 uppercase italic">Protocolo de Baja Técnica</h4>
           </div>
-          <div className="bg-white border-2 border-dashed border-gray-200 rounded-[2rem] p-6 space-y-4">
-              {["Ubica el equipo en la sección de 'Bajas'.", "Escribe el motivo del retiro.", "Genera y descarga el PDF oficial.", "Lleva el documento a firma con tu jefe."].map((step, i) => (
-                <div key={i} className="flex gap-4 items-start">
-                  <div className="bg-emerald-600 text-white p-1 rounded-full mt-0.5 shadow-lg shadow-emerald-200"><CheckCircle2 size={12}/></div>
-                  <p className="text-sm font-bold text-slate-700">{step}</p>
-                </div>
-              ))}
+          <div className="bg-slate-50 p-6 rounded-[2rem] space-y-4">
+            <p className="text-sm text-slate-600 font-medium">Si un equipo sufre un daño irreparable o ha cumplido su vida útil, sigue este flujo obligatorio:</p>
+            <ol className="space-y-3 ml-4">
+              <li className="text-xs text-slate-500 flex gap-3">
+                <span className="font-black text-emerald-600">1.</span>
+                <span>Selecciona el activo en el módulo de <strong>"Bajas"</strong>.</span>
+              </li>
+              <li className="text-xs text-slate-500 flex gap-3">
+                <span className="font-black text-emerald-600">2.</span>
+                <span>Describe detalladamente la falla (ej. "No enciende tras descarga eléctrica" o "Pantalla rota").</span>
+              </li>
+              <li className="text-xs text-slate-500 flex gap-3">
+                <span className="font-black text-emerald-600">3.</span>
+                <span>Genera el documento PDF de solicitud. Este documento tiene validez legal interna.</span>
+              </li>
+              <li className="text-xs text-slate-500 flex gap-3">
+                <span className="font-black text-emerald-600">4.</span>
+                <span>Recaba la firma de tu jefe inmediato y entrega el equipo físicamente al almacén central.</span>
+              </li>
+            </ol>
           </div>
         </section>
-
-        <div className="mt-10 pt-6 border-t border-gray-100 flex items-center gap-3 italic">
-          <Info size={20} className="text-blue-500" />
-          <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Soporte Técnico UTN • 2026</p>
-        </div>
       </div>
     )
   },
+
   admin: {
-    titulo: "Manual de Administrador",
-    subtitulo: "Control Maestro del Sistema",
+    titulo: "Consola de Administración Central",
+    subtitulo: "Control Maestro de Infraestructura y Usuarios",
     color: "blue",
     content: (
-      <div className="space-y-10 p-2 pb-10">
-        {/* Resumen de Poderes */}
-        <section className="relative p-6 bg-blue-50 rounded-[2rem] border border-blue-100 overflow-hidden">
+      <div className="space-y-12 p-2 pb-10">
+        {/* CABECERA ADMIN */}
+        <section className="p-8 bg-slate-900 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden">
           <div className="relative z-10">
-            <h4 className="text-lg font-black text-blue-800 flex items-center gap-2 mb-2 uppercase italic">
-               Consola de Administración
+            <h4 className="text-xl font-black flex items-center gap-2 mb-4 uppercase italic text-blue-400">
+              <ShieldCheck size={24} /> Privilegios de Super-Administrador
             </h4>
-            <p className="text-sm text-blue-700/80 leading-relaxed font-medium">
-              Tienes acceso a la gestión de usuarios, edición de activos y supervisión de solicitudes de baja. Tu rol es vital para mantener la veracidad del inventario.
+            <p className="text-sm text-blue-100/70 leading-relaxed font-medium max-w-3xl">
+              Este nivel de acceso te permite auditar la totalidad de la base de datos institucional. Tienes la facultad de modificar la arquitectura de edificios, gestionar el ciclo de vida de los activos y supervisar las cuentas de usuario. Cada cambio queda registrado para fines de auditoría.
             </p>
           </div>
-          <ShieldCheck size={120} className="absolute top-[-20px] right-[-20px] text-blue-200/50" />
+          <Box size={180} className="absolute bottom-[-40px] right-[-40px] opacity-10" />
         </section>
 
-        {/* Gestión de Usuarios */}
-        <section>
-          <div className="flex items-center gap-3 mb-4">
-            <span className="bg-slate-900 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs font-black">01</span>
-            <h4 className="text-xl font-black text-slate-800 uppercase italic tracking-tighter">Gestión de Personal</h4>
+        {/* GESTIÓN DE ESTRUCTURA */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-600 text-white rounded-2xl flex items-center justify-center font-black shadow-lg shadow-blue-200">01</div>
+            <h4 className="text-xl font-black text-slate-800 uppercase italic">Mantenimiento de Infraestructura</h4>
           </div>
-          <div className="p-5 border-2 border-gray-50 rounded-2xl bg-white space-y-3">
-            <p className="text-xs text-gray-500 font-medium">
-              En la sección de <strong>Usuarios</strong> puedes:
-            </p>
-            <ul className="space-y-2">
-              <li className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div> Crear nuevos accesos (Docentes/Admins).
-              </li>
-              <li className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div> Inactivar cuentas (en lugar de borrarlas) para preservar el historial.
-              </li>
-              <li className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div> Resetear claves y editar roles de seguridad.
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Auditoría y Edificios */}
-        <section>
-          <div className="flex items-center gap-3 mb-4">
-            <span className="bg-slate-900 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs font-black">02</span>
-            <h4 className="text-xl font-black text-slate-800 uppercase italic tracking-tighter">Control de Ubicaciones</h4>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-5 border-2 border-gray-50 rounded-2xl bg-white">
-              <p className="font-bold text-sm text-slate-800 mb-2 italic">Edificios y Aulas</p>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                Supervisa qué activos pertenecen a cada zona. Si un aula cambia de nombre o propósito, asegúrate de actualizarlo para evitar confusiones en los resguardos.
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-6 bg-white border border-slate-100 rounded-[2rem] shadow-sm space-y-3">
+              <div className="flex items-center gap-2 text-blue-600">
+                <RefreshCw size={20} />
+                <h5 className="font-black text-xs uppercase">Edificios y Aulas</h5>
+              </div>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Antes de cargar nuevos activos, verifica que el edificio y aula existan en el sistema. El orden lógico es: Crear Edificio → Vincular Aula → Asignar Activo. Si borras un aula con activos, estos quedarán en un estado de "limbo" administrativo.
               </p>
             </div>
-            <div className="p-5 border-2 border-gray-50 rounded-2xl bg-white">
-              <p className="font-bold text-sm text-slate-800 mb-2 italic">Grupos/Categorías</p>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                Clasifica los activos (Ej: Cómputo, Mobiliario). Una buena categorización permite obtener estadísticas precisas en el Dashboard.
+            <div className="p-6 bg-white border border-slate-100 rounded-[2rem] shadow-sm space-y-3">
+              <div className="flex items-center gap-2 text-blue-600">
+                <Users size={20} />
+                <h5 className="font-black text-xs uppercase">Gestión de Usuarios</h5>
+              </div>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Al crear un usuario nuevo (Docente/Administrador), asegúrate de que su número de empleado sea exacto, ya que es la llave única para las transferencias de resguardo. No elimines usuarios con activos; primero transfiere su carga.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Supervisión de Bajas */}
-        <section>
-          <div className="flex items-center gap-3 mb-4">
-            <span className="bg-slate-900 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs font-black">03</span>
-            <h4 className="text-xl font-black text-slate-800 uppercase italic tracking-tighter">Aprobación de Bajas</h4>
+        {/* AUDITORÍA Y MARBETES */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-slate-900 text-white rounded-2xl flex items-center justify-center font-black">02</div>
+            <h4 className="text-xl font-black text-slate-800 uppercase italic">Herramientas de Auditoría Física</h4>
           </div>
-          <div className="bg-slate-900 rounded-[2rem] p-6 text-white shadow-xl">
-            <div className="flex gap-4 mb-4">
-              <div className="p-3 bg-white/10 rounded-xl"><Info className="text-blue-400" /></div>
-              <p className="text-xs font-medium text-blue-100 leading-relaxed">
-                El sistema marca como "Inactivo" automáticamente cualquier equipo que pase por el proceso de Baja Técnica una vez aprobado por el administrador.
+          <div className="bg-blue-50/50 p-8 rounded-[2.5rem] border border-blue-100 flex flex-col md:flex-row gap-8">
+            <div className="flex-1 space-y-4">
+              <h5 className="font-black text-sm text-blue-800 uppercase tracking-tighter">Impresión de Marbetes Masiva</h5>
+              <p className="text-xs text-blue-700 leading-relaxed">
+                En la sección inferior de "Recursos", puedes seleccionar múltiples activos para generar una hoja de impresión de marbetes. El sistema ajusta automáticamente el tamaño para que sea compatible con impresoras de etiquetas estándar.
               </p>
+              <div className="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase bg-white w-fit px-3 py-1 rounded-full border border-blue-200">
+                <Printer size={12} /> Sugerencia: Usa papel adhesivo térmico.
+              </div>
             </div>
-            <div className="space-y-3">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-300">Responsabilidad:</p>
-              <p className="text-sm font-bold italic">"No apruebes una baja sin haber verificado físicamente el estado del equipo o contar con el oficio firmado."</p>
+            <div className="w-full md:w-64 bg-slate-900 rounded-3xl p-6 text-white shadow-xl">
+              <div className="flex gap-4 mb-4">
+                <Info className="text-blue-400" size={20} />
+                <p className="text-[10px] font-medium text-blue-100 leading-relaxed uppercase tracking-widest">Atención</p>
+              </div>
+              <p className="text-xs italic text-blue-200">
+                "Las bajas enviadas por usuarios no son automáticas. Tú debes validar físicamente el daño antes de cambiar el estatus a 'Inactivo' para que el sistema descuente el activo del patrimonio."
+              </p>
             </div>
           </div>
         </section>
-
-        {/* Cierre */}
-        <div className="mt-10 pt-6 border-t border-gray-100 flex items-center justify-between">
-          <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Nivel de Acceso: SuperAdmin</p>
-          <div className="flex gap-2">
-             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-             <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
-             <div className="w-2 h-2 bg-blue-100 rounded-full"></div>
-          </div>
-        </div>
-          </div>
-        )
-      }
-    };
+      </div>
+    )
+  }
+};
