@@ -3,7 +3,7 @@ import {
   BookOpen, Printer, Download, Search, 
   ShieldCheck, X, Library, Loader2, 
   Square, CheckSquare, Trash2, 
-  ListChecks, Dices, ChevronLeft, ChevronRight
+  ListChecks, Dices, ChevronLeft, ChevronRight, MapPin, Info
 } from "lucide-react";
 import { PDFViewer, Document, Page, View, Text, Image, StyleSheet, pdf } from '@react-pdf/renderer';
 import { GuiasData } from "../data/GuiasData";
@@ -62,8 +62,7 @@ export default function Recursos() {
   const [seleccionados, setSeleccionados] = useState([]);
   const [guiaAbierta, setGuiaAbierta] = useState(null);
   const [isModalPDF, setIsModalPDF] = useState(false);
-  
-  // Estados de Búsqueda y Paginación
+
   const [busquedaMarbetes, setBusquedaMarbetes] = useState("");
   const [busquedaManual, setBusquedaManual] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -82,7 +81,6 @@ export default function Recursos() {
       }).catch(() => setLoading(false));
   }, []);
 
-  // Lógica Filtrado Marbetes
   const filtradosMarbetes = useMemo(() => {
     const q = busquedaMarbetes.toLowerCase();
     return activos.filter(a => (a.nombre || "").toLowerCase().includes(q) || (a.marbete || "").toLowerCase().includes(q));
@@ -93,10 +91,14 @@ export default function Recursos() {
     return filtradosMarbetes.slice(start, start + ITEMS_PER_PAGE);
   }, [filtradosMarbetes, currentPage]);
 
-  // Lógica Filtrado Auditoría Manual
   const filtradosManual = useMemo(() => {
     const q = busquedaManual.toLowerCase();
-    return activos.filter(a => (a.nombre || "").toLowerCase().includes(q) || (a.marbete || "").toLowerCase().includes(q));
+    return activos.filter(a => 
+      (a.nombre || "").toLowerCase().includes(q) || 
+      (a.marbete || "").toLowerCase().includes(q) ||
+      (a.edificio || "").toLowerCase().includes(q) ||
+      (a.aula || "").toLowerCase().includes(q)
+    );
   }, [busquedaManual, activos]);
 
   const paginadosManual = useMemo(() => {
@@ -140,7 +142,6 @@ export default function Recursos() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       
-      {/* BANNER */}
       <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-emerald-800 to-slate-900 p-10 text-white shadow-2xl">
         <div className="relative z-10 max-w-2xl">
           <h1 className="text-4xl font-black tracking-tighter mb-4 italic uppercase">Recursos e Impresión</h1>
@@ -149,7 +150,6 @@ export default function Recursos() {
         <Library className="absolute right-[-20px] bottom-[-20px] text-white/10" size={240} />
       </div>
 
-      {/* TABS NAVEGACIÓN */}
       <div className="flex p-1.5 bg-white border border-emerald-100 rounded-3xl w-fit shadow-sm">
         {["guias", "marbetes", "auditoria"].map((t) => (
           <button 
@@ -163,7 +163,6 @@ export default function Recursos() {
       </div>
 
       <div className="min-h-[500px]">
-        {/* PESTAÑA MANUALES */}
         {activeTab === "guias" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in slide-in-from-bottom-4">
             {['admin', 'usuario'].map((id) => (
@@ -181,7 +180,6 @@ export default function Recursos() {
           </div>
         )}
 
-        {/* PESTAÑA ETIQUETAS */}
         {activeTab === "marbetes" && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in slide-in-from-bottom-4">
             <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-emerald-100 shadow-sm flex flex-col">
@@ -217,7 +215,6 @@ export default function Recursos() {
           </div>
         )}
 
-        {/* PESTAÑA AUDITORÍA */}
         {activeTab === "auditoria" && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in slide-in-from-bottom-4">
             <div className="lg:col-span-2 space-y-6">
@@ -236,21 +233,36 @@ export default function Recursos() {
 
               {isManual && (
                 <div className="bg-emerald-50/50 p-8 rounded-[3rem] border border-emerald-100 animate-in zoom-in-95 duration-200">
-                  <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-                    <div className="relative flex-1 w-full">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600" size={20} />
-                      <input 
-                        type="text" 
-                        placeholder="Filtrar activos..." 
-                        className="w-full pl-12 pr-6 py-4 bg-white rounded-2xl text-sm font-bold outline-none border border-emerald-100 shadow-sm" 
-                        value={busquedaManual} 
-                        onChange={(e) => {setBusquedaManual(e.target.value); setPageAuditoria(1);}}
-                      />
+                  <div className="flex flex-col gap-4 mb-6">
+                    <div className="flex flex-col md:flex-row gap-3">
+                      <div className="relative flex-[2]">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600" size={18} />
+                        <input 
+                          type="text" 
+                          placeholder="Filtrar por nombre, marbete, aula o edificio..." 
+                          className="w-full pl-12 pr-6 py-4 bg-white rounded-2xl text-sm font-bold outline-none border border-emerald-100 shadow-sm" 
+                          value={busquedaManual} 
+                          onChange={(e) => {setBusquedaManual(e.target.value); setPageAuditoria(1);}}
+                        />
+                      </div>
+                      <button 
+                        onClick={() => {
+                          const nuevos = filtradosManual.filter(p => !seleccionados.some(s => s.idActivo === p.idActivo));
+                          setSeleccionados([...seleccionados, ...nuevos.map(n => ({...n, revisado: false}))]);
+                        }}
+                        className="flex-1 bg-emerald-600 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-md"
+                      >
+                        Seleccionar Todo el Filtro
+                      </button>
                     </div>
-                    <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-emerald-100">
-                      <button onClick={() => setPageAuditoria(Math.max(1, pageAuditoria - 1))} className="p-1 hover:text-emerald-600" disabled={pageAuditoria === 1}><ChevronLeft size={20}/></button>
-                      <span className="text-[10px] font-black uppercase italic text-slate-500">{pageAuditoria} / {totalPagesAuditoria || 1}</span>
-                      <button onClick={() => setPageAuditoria(Math.min(totalPagesAuditoria, pageAuditoria + 1))} className="p-1 hover:text-emerald-600" disabled={pageAuditoria === totalPagesAuditoria}><ChevronRight size={20}/></button>
+
+                    <div className="flex justify-between items-center bg-white/50 p-3 rounded-2xl border border-emerald-100/50">
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => setPageAuditoria(Math.max(1, pageAuditoria - 1))} className="p-1 hover:text-emerald-600" disabled={pageAuditoria === 1}><ChevronLeft size={20}/></button>
+                        <span className="text-[10px] font-black uppercase italic text-slate-500">{pageAuditoria} / {totalPagesAuditoria || 1}</span>
+                        <button onClick={() => setPageAuditoria(Math.min(totalPagesAuditoria, pageAuditoria + 1))} className="p-1 hover:text-emerald-600" disabled={pageAuditoria === totalPagesAuditoria}><ChevronRight size={20}/></button>
+                      </div>
+                      <p className="text-[9px] font-black text-emerald-700 uppercase italic">Resultados: {filtradosManual.length}</p>
                     </div>
                   </div>
                   
@@ -261,10 +273,14 @@ export default function Recursos() {
                         <div key={act.idActivo} onClick={() => {
                             if(isSelected) setSeleccionados(seleccionados.filter(s => s.idActivo !== act.idActivo));
                             else setSeleccionados([...seleccionados, { ...act, revisado: false }]);
-                          }} className={`p-4 rounded-2xl border transition-all cursor-pointer ${isSelected ? 'bg-emerald-600 border-emerald-600 text-white shadow-md' : 'bg-white border-emerald-100 hover:border-emerald-400'}`}>
+                        }} className={`p-4 rounded-2xl border transition-all cursor-pointer ${isSelected ? 'bg-emerald-600 border-emerald-600 text-white shadow-md' : 'bg-white border-emerald-100 hover:border-emerald-400'}`}>
                           <div className="flex flex-col">
                             <span className={`text-[9px] font-black uppercase ${isSelected ? 'text-white/80' : 'text-emerald-600'}`}>{act.marbete}</span>
                             <span className="text-[10px] font-bold uppercase truncate">{act.nombre}</span>
+                            <div className="flex items-center gap-1 mt-1">
+                                <MapPin size={10} className={isSelected ? 'text-white/60' : 'text-emerald-500'}/>
+                                <span className={`text-[8px] font-medium ${isSelected ? 'text-white/60' : 'text-slate-400'}`}>{act.edificio} - {act.aula}</span>
+                            </div>
                           </div>
                         </div>
                       );
@@ -278,7 +294,6 @@ export default function Recursos() {
         )}
       </div>
 
-      {/* MODALES */}
       {guiaAbierta && (
         <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex justify-end">
           <div className="bg-white w-full max-w-xl h-full p-8 overflow-y-auto animate-in slide-in-from-right duration-300 shadow-2xl">
@@ -323,7 +338,14 @@ function PanelCola({ seleccionados, setSeleccionados, setIsModalPDF, type }) {
           <h4 className="font-black uppercase italic text-sm tracking-widest text-emerald-400">
             {type === 'auditoria' ? 'En Auditoría' : 'Para Impresión'}
           </h4>
-          <span className="bg-emerald-500 text-slate-900 text-[10px] px-3 py-1 rounded-full font-black">{seleccionados.length}</span>
+          <div className="flex items-center gap-2">
+            {seleccionados.length > 0 && (
+              <button onClick={() => setSeleccionados([])} className="p-2 text-slate-500 hover:text-red-400 transition-colors" title="Limpiar todo">
+                <Trash2 size={16}/>
+              </button>
+            )}
+            <span className="bg-emerald-500 text-slate-900 text-[10px] px-3 py-1 rounded-full font-black">{seleccionados.length}</span>
+          </div>
         </div>
         <div className="space-y-3 flex-grow max-h-80 overflow-y-auto mb-6 pr-2 custom-scrollbar">
           {seleccionados.length === 0 ? (
