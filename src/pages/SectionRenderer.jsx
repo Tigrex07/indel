@@ -60,7 +60,7 @@ export default function SectionRenderer({
       return <Encargados />;
 
     case "bajas":
-      return <Bajas />;
+      return <Bajas userId={userId}/>;
 
     case "reportes":
       return <Reportes />;
