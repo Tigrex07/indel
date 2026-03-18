@@ -1,4 +1,8 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { 
+  X, Package, Calendar, Tag, MapPin, Hash, 
+  FileText, DollarSign, Activity, Edit3, Save, RotateCcw, Info
+} from "lucide-react";
 
 export default function ActivoModal({
   activo,
@@ -27,41 +31,60 @@ export default function ActivoModal({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-6xl rounded-2xl shadow-2xl border border-emerald-200 flex flex-col max-h-[85vh]">
+    <div className="fixed inset-0 flex items-center justify-center z-[100] bg-slate-900/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-5xl rounded-[3rem] shadow-2xl border border-slate-100 flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in duration-300">
 
-        {/* HEADER */}
-        <div className="flex justify-between items-center px-8 py-6 border-b">
-          <h3 className="text-2xl font-bold text-emerald-700">
-            Detalles del Activo
-          </h3>
+        {/* 🟢 HEADER EVOLUCIONADO (Nombre + Clave) */}
+        <div className="relative bg-gradient-to-r from-emerald-600 to-emerald-800 px-10 py-9 text-white">
+          <div className="relative z-10 flex justify-between items-center">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                 <Package size={18} className="text-emerald-300" />
+                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-200">Expediente de Activo</span>
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-4">
+                <h3 className="text-4xl font-black italic uppercase tracking-tighter leading-none">
+                  {localActivo.nombre || "Sin Nombre"}
+                </h3>
+                {/* Badge de Clave al lado del nombre */}
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/20 shadow-lg">
+                  <Hash size={16} className="text-emerald-300" />
+                  <span className="text-sm font-black tracking-widest uppercase">{localActivo.clave || "S/C"}</span>
+                </div>
+              </div>
+            </div>
 
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-red-500 text-xl"
-          >
-            ✕
-          </button>
+            <button
+              onClick={onClose}
+              className="w-14 h-14 bg-white/10 hover:bg-white/20 text-white rounded-[1.5rem] flex items-center justify-center transition-all group border border-white/10"
+            >
+              <X size={28} className="group-hover:rotate-90 transition-transform" />
+            </button>
+          </div>
+          
+          {/* Decoración de fondo */}
+          <div className="absolute top-0 right-0 opacity-10 translate-x-10 -translate-y-10">
+             <Package size={220} strokeWidth={1} />
+          </div>
         </div>
 
-        {/* BODY SCROLLABLE */}
-        <div className="overflow-y-auto px-8 py-6 space-y-10">
+        {/* ⚪️ BODY SCROLLABLE */}
+        <div className="overflow-y-auto px-10 py-8 space-y-10 custom-scrollbar bg-slate-50/50">
 
-          {/* INFORMACIÓN GENERAL */}
-          <Section title="Información General">
+          {/* SECCIÓN 1: UBICACIÓN Y CONTROL */}
+          <Section title="Ubicación y Control" icon={<MapPin size={18}/>}>
             <Grid>
-              <Field label="Nombre" value={localActivo.nombre} />
-              <Field label="Clave" value={localActivo.clave} />
-              <Field label="Fecha" value={localActivo.fecha} />
-              <Field label="Marbete" value={localActivo.marbete} />
-              <Field label="Edificio" value={localActivo.edificio} />
-              <Field label="Aula" value={localActivo.aula} />
-              <Field label="Grupo" value={localActivo.grupo} />
+              {/* El Marbete ahora tiene un lugar más protagónico al no estar la Clave al lado */}
+              <Field label="Marbete de Identificación" value={localActivo.marbete} icon={<Tag size={14}/>} highlight />
+              <Field label="Edificio / Aula" value={`${localActivo.edificio || '—'} / ${localActivo.aula || '—'}`} icon={<MapPin size={14}/>} />
+              <Field label="Grupo Asignado" value={localActivo.grupo} icon={<Activity size={14}/>} />
+              <Field label="Fecha de Alta" value={localActivo.fecha} icon={<Calendar size={14}/>} />
             </Grid>
           </Section>
 
-          {/* DOCUMENTO */}
-          <Section title="Documento">
+          {/* SECCIÓN 2: DOCUMENTACIÓN */}
+          <Section title="Documentación de Origen" icon={<FileText size={18}/>}>
             <Grid>
               <EditableField
                 label="Tipo de Documento"
@@ -69,13 +92,15 @@ export default function ActivoModal({
                 value={localActivo.tipo_documento}
                 editMode={editMode}
                 onChange={handleChange}
+                icon={<FileText size={14}/>}
               />
               <EditableField
-                label="Referencia"
+                label="Referencia / Factura"
                 name="referencia"
                 value={localActivo.referencia}
                 editMode={editMode}
                 onChange={handleChange}
+                icon={<Info size={14}/>}
               />
               <EditableField
                 label="Folio VR"
@@ -83,6 +108,7 @@ export default function ActivoModal({
                 value={localActivo.folioVR}
                 editMode={editMode}
                 onChange={handleChange}
+                icon={<Hash size={14}/>}
               />
               <EditableField
                 label="Fecha del Documento"
@@ -90,84 +116,107 @@ export default function ActivoModal({
                 value={localActivo.fecha_documento}
                 editMode={editMode}
                 onChange={handleChange}
+                icon={<Calendar size={14}/>}
               />
             </Grid>
           </Section>
 
-          {/* FINANCIERO */}
-          <Section title="Información Financiera">
+          {/* SECCIÓN 3: FINANCIERO */}
+          <Section title="Valor e Impacto" icon={<DollarSign size={18}/>}>
             <Grid>
               <EditableField
-                label="Importe"
+                label="Importe (MXN)"
                 name="importe"
                 value={localActivo.importe}
                 editMode={editMode}
                 onChange={handleChange}
+                icon={<DollarSign size={14}/>}
+                isMoney
               />
-              <Field
-                label="Estado"
-                value={localActivo.actividad == 1 ? "Activo" : "Inactivo"}
-              />
+              <div className="flex flex-col gap-2 lg:col-span-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+                   <Activity size={12}/> Estado Operativo
+                </label>
+                <div className={`px-5 py-3 rounded-2xl font-black text-xs uppercase inline-flex w-fit items-center gap-3 border transition-all ${localActivo.actividad == 1 ? 'bg-emerald-50 text-emerald-600 border-emerald-100 shadow-sm shadow-emerald-50' : 'bg-red-50 text-red-600 border-red-100 shadow-sm shadow-red-50'}`}>
+                  <div className={`w-2.5 h-2.5 rounded-full animate-pulse ${localActivo.actividad == 1 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]'}`}></div>
+                  {localActivo.actividad == 1 ? "Activo en Inventario" : "Inactivo / Baja de Sistema"}
+                </div>
+              </div>
             </Grid>
           </Section>
 
-          {/* DESCRIPCIÓN GRANDE */}
-          <Section title="Descripción">
+          {/* SECCIÓN 4: DESCRIPCIÓN */}
+          <Section title="Descripción Técnica" icon={<Info size={18}/>}>
             {editMode ? (
               <textarea
                 name="descripcion"
                 value={localActivo.descripcion || ""}
                 onChange={handleChange}
-                className="w-full border rounded-lg p-4 min-h-[150px] focus:ring-2 focus:ring-emerald-400 outline-none"
+                className="w-full border-2 border-slate-100 rounded-[2.5rem] p-7 min-h-[160px] focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-medium text-slate-700 bg-white shadow-inner custom-scrollbar"
+                placeholder="Detalla las características físicas o técnicas del activo..."
               />
             ) : (
-              <div className="bg-gray-50 border rounded-lg p-4 min-h-[120px] whitespace-pre-wrap">
-                {localActivo.descripcion || "Sin descripción"}
+              <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 min-h-[140px] whitespace-pre-wrap text-slate-600 font-medium leading-relaxed shadow-sm border-b-4 border-b-emerald-500/20">
+                {localActivo.descripcion || "No existe una descripción técnica detallada para este activo."}
               </div>
             )}
           </Section>
-
         </div>
 
-        {/* FOOTER */}
-        <div className="flex justify-end gap-4 px-8 py-6 border-t bg-gray-50">
-          {editMode && (
-            <button
-              onClick={handleSaveClick}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              Guardar
-            </button>
-          )}
-
-          <button
-            onClick={() => setEditMode(!editMode)}
-            className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition"
-          >
-            {editMode ? "Cancelar" : "Editar"}
-          </button>
-
+        {/* 🟢 FOOTER */}
+        <div className="flex justify-between items-center px-10 py-8 border-t bg-white">
           <button
             onClick={onClose}
-            className="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500 transition"
+            className="group flex items-center gap-2 text-slate-400 hover:text-emerald-600 font-black text-[11px] uppercase tracking-[0.2em] transition-all"
           >
-            Cerrar
+            <RotateCcw size={14} className="group-hover:-rotate-45 transition-transform"/> Salir de la ficha
           </button>
-        </div>
 
+          <div className="flex gap-4">
+            {editMode ? (
+              <>
+                <button
+                  onClick={() => setEditMode(false)}
+                  className="bg-slate-100 text-slate-500 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center gap-2"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSaveClick}
+                  className="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all flex items-center gap-2 active:scale-95"
+                >
+                  <Save size={18}/> Guardar Cambios
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setEditMode(true)}
+                className="bg-emerald-600 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-700 shadow-xl shadow-emerald-100 transition-all flex items-center gap-2 active:scale-95"
+              >
+                <Edit3 size={18}/> Editar Ficha
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-/* 🔹 COMPONENTES INTERNOS */
+/* 🔹 COMPONENTES AUXILIARES */
 
-function Section({ title, children }) {
+function Section({ title, icon, children }) {
   return (
-    <div>
-      <h4 className="text-lg font-semibold text-emerald-700 mb-4">
-        {title}
-      </h4>
+    <div className="animate-in slide-in-from-bottom-2 duration-500">
+      <div className="flex items-center gap-3 mb-7 px-1">
+        <div className="w-11 h-11 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center shadow-sm">
+          {icon}
+        </div>
+        <h4 className="text-sm font-black text-slate-800 uppercase italic tracking-tight">
+          {title}
+        </h4>
+        <div className="flex-1 h-[1px] bg-slate-100 ml-4 opacity-50"></div>
+      </div>
       {children}
     </div>
   );
@@ -175,37 +224,41 @@ function Section({ title, children }) {
 
 function Grid({ children }) {
   return (
-    <div className="grid grid-cols-3 gap-6 text-sm">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7 px-1">
       {children}
     </div>
   );
 }
 
-function Field({ label, value }) {
+function Field({ label, value, icon, highlight = false }) {
   return (
-    <div className="flex flex-col">
-      <label className="font-semibold mb-1">{label}</label>
-      <div className="bg-gray-50 border rounded-lg px-3 py-2 min-h-[38px]">
+    <div className="flex flex-col gap-2.5">
+      <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] flex items-center gap-2 px-1">
+         {icon} {label}
+      </label>
+      <div className={`px-5 py-4 rounded-[1.3rem] font-bold text-[13px] min-h-[52px] flex items-center border transition-all ${highlight ? 'bg-emerald-50 border-emerald-100 text-emerald-700 shadow-inner' : 'bg-white border-slate-100 text-slate-600 shadow-sm'}`}>
         {value || "—"}
       </div>
     </div>
   );
 }
 
-function EditableField({ label, name, value, editMode, onChange }) {
+function EditableField({ label, name, value, editMode, onChange, icon, isMoney = false }) {
   return (
-    <div className="flex flex-col">
-      <label className="font-semibold mb-1">{label}</label>
+    <div className="flex flex-col gap-2.5">
+      <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] flex items-center gap-2 px-1">
+         {icon} {label}
+      </label>
       {editMode ? (
         <input
           name={name}
           value={value || ""}
           onChange={onChange}
-          className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-400 outline-none"
+          className="w-full bg-white border-2 border-emerald-100 rounded-[1.3rem] px-5 py-4 text-[13px] font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all shadow-sm"
         />
       ) : (
-        <div className="bg-gray-50 border rounded-lg px-3 py-2 min-h-[38px]">
-          {value || "—"}
+        <div className="px-5 py-4 bg-white border border-slate-100 rounded-[1.3rem] text-[13px] font-bold text-slate-600 min-h-[52px] flex items-center shadow-sm">
+          {isMoney && value ? `$ ` : ""}{value || "—"}
         </div>
       )}
     </div>
