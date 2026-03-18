@@ -88,14 +88,14 @@ export default function DashboardHome() {
   );
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in duration-500 pb-10">
+    <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in duration-500 pb-10 px-4 xl:px-0">
       
       {/* HEADER */}
       <div>
-        <h1 className="text-3xl font-black text-gray-800 tracking-tight uppercase italic">
+        <h1 className="text-3xl font-black text-gray-800 tracking-tight uppercase italic leading-none">
           Dashboard <span className="text-emerald-600">Home</span>
         </h1>
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Control General de Activos</p>
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2 ml-1">Control General de Activos</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -105,28 +105,28 @@ export default function DashboardHome() {
       </div>
 
       {/* FILTROS DINÁMICOS */}
-      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 items-end">
+      <div className="bg-white border border-slate-100 rounded-[2rem] p-8 shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-end">
           
           <div className="space-y-1.5 lg:col-span-1">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Buscador</label>
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 italic">Buscador</label>
             <div className="relative">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500/50" />
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500" />
               <input
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setPage(1); }}
-                placeholder="Buscar activo..."
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm font-semibold text-gray-700 outline-none focus:border-emerald-500 transition-all"
+                placeholder="Nombre, marbete..."
+                className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-emerald-500 transition-all"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Edificio</label>
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 italic">Edificio</label>
             <select
               value={edificio}
               onChange={(e) => { setEdificio(e.target.value); setPage(1); }}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 outline-none focus:border-emerald-500 cursor-pointer"
+              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-emerald-500 cursor-pointer transition-all"
             >
               <option>Todos</option>
               {[...new Set(activosActivos.map((i) => i.edificio))].sort().map((e) => <option key={e}>{e}</option>)}
@@ -134,12 +134,12 @@ export default function DashboardHome() {
           </div>
 
           <div className={`space-y-1.5 transition-all duration-300 ${edificio === "Todos" ? "opacity-30 pointer-events-none" : "opacity-100"}`}>
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Aula</label>
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 italic">Aula</label>
             <select
               value={aula}
               onChange={(e) => { setAula(e.target.value); setPage(1); }}
               disabled={edificio === "Todos"}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 outline-none focus:border-emerald-500 cursor-pointer disabled:bg-gray-100"
+              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-emerald-500 cursor-pointer transition-all disabled:bg-slate-100"
             >
               <option>Todas</option>
               {aulasDisponibles.map((a) => <option key={a}>{a}</option>)}
@@ -147,20 +147,21 @@ export default function DashboardHome() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Grupo</label>
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 italic">Grupo</label>
             <select
               value={grupo}
               onChange={(e) => { setGrupo(e.target.value); setPage(1); }}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 outline-none focus:border-emerald-500 cursor-pointer"
+              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-emerald-500 cursor-pointer transition-all"
             >
               <option>Todos</option>
               {[...new Set(activosActivos.map((i) => i.grupo))].sort().map((g) => <option key={g}>{g}</option>)}
             </select>
           </div>
 
+          {/* 🟢 BOTÓN REINICIAR VERDE */}
           <button
             onClick={() => {setQuery(""); setEdificio("Todos"); setAula("Todas"); setGrupo("Todos"); setPage(1);}}
-            className="flex items-center justify-center gap-2 bg-gray-800 text-white py-3 rounded-xl hover:bg-emerald-600 transition-all font-bold text-xs uppercase tracking-widest"
+            className="flex items-center justify-center gap-2 bg-emerald-600 text-white py-3.5 rounded-xl hover:bg-emerald-700 hover:scale-[1.02] active:scale-95 transition-all font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-emerald-100"
           >
             <RotateCcw size={16} />
             Reiniciar
@@ -168,80 +169,90 @@ export default function DashboardHome() {
         </div>
       </div>
 
-      {/* TABLA DE ACTIVOS ACTUALIZADA */}
-      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="bg-gray-50/50 border-b border-gray-100">
-              <th className="px-6 py-4 text-[10px] font-bold uppercase text-gray-400 tracking-widest">Nombre del Activo</th>
-              <th className="px-6 py-4 text-[10px] font-bold uppercase text-gray-400 tracking-widest">Edificio</th>
-              <th className="px-6 py-4 text-[10px] font-bold uppercase text-gray-400 tracking-widest">Aula</th>
-              <th className="px-6 py-4 text-[10px] font-bold uppercase text-gray-400 tracking-widest">Grupo</th>
-              <th className="px-6 py-4 text-[10px] font-bold uppercase text-gray-400 tracking-widest text-right">Marbete</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {paginaData.length ? (
-              paginaData.map((i) => (
-                <tr key={i.idActivo} onClick={() => abrirActivo(i)} className="hover:bg-emerald-50/40 cursor-pointer transition-colors group">
-                  <td className="px-6 py-4 text-sm font-bold text-gray-800 uppercase group-hover:text-emerald-600">
-                    {i.nombre}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-xs font-semibold text-gray-600 flex items-center gap-2">
-                        <Building2 size={14} className="text-emerald-500" /> {i.edificio}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-[10px] font-black text-gray-400 uppercase bg-gray-100 px-2 py-1 rounded-md">
+      {/* 📋 TABLA CON ENMARCADO VERDE (ESTILO UNIFICADO) */}
+      <div className="bg-white rounded-[2.5rem] border-2 border-emerald-600 shadow-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              {/* CABECERA VERDE ESMERALDA */}
+              <tr className="bg-emerald-600">
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-50 border-b border-emerald-700/50 italic">Activo</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-50 border-b border-emerald-700/50 italic">Edificio</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-50 border-b border-emerald-700/50 italic">Aula</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-50 border-b border-emerald-700/50 italic">Categoría</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-50 border-b border-emerald-700/50 text-right italic">Marbete</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {paginaData.length ? (
+                paginaData.map((i) => (
+                  <tr key={i.idActivo} onClick={() => abrirActivo(i)} className="hover:bg-emerald-50/50 cursor-pointer transition-all group">
+                    <td className="px-8 py-5 text-sm font-black text-slate-700 uppercase group-hover:text-emerald-700 transition-colors tracking-tighter leading-tight">
+                      {i.nombre}
+                    </td>
+                    <td className="px-8 py-5">
+                      <div className="flex items-center gap-2">
+                        <Building2 size={12} className="text-emerald-500" />
+                        <span className="text-[11px] font-bold text-slate-500 uppercase">{i.edificio}</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-5">
+                      <span className="text-[10px] font-black text-slate-400 uppercase bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-lg group-hover:bg-white transition-colors">
                         {i.aula}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">
-                    {i.grupo}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={(e) => copiarMarbete(e, i.marbete)}
-                      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-mono text-xs font-bold border transition-all
-                        ${copiado === i.marbete 
-                          ? "bg-emerald-600 border-emerald-600 text-white" 
-                          : "bg-gray-50 border-gray-200 text-gray-400 hover:border-emerald-400 hover:text-emerald-600"}`}
-                    >
-                      {i.marbete}
-                      {copiado === i.marbete ? <CheckCircle size={14} /> : <Copy size={14} className="opacity-30" />}
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr><td colSpan="5" className="py-20 text-center text-gray-300 font-bold uppercase text-xs">Sin coincidencias</td></tr>
-            )}
-          </tbody>
-        </table>
-        
-        {/* PAGINACIÓN */}
-        <div className="px-8 py-4 bg-gray-50/50 border-t border-gray-100 flex justify-between items-center">
+                      </span>
+                    </td>
+                    <td className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase italic">
+                      {i.grupo}
+                    </td>
+                    <td className="px-8 py-5 text-right">
+                      <button
+                        onClick={(e) => copiarMarbete(e, i.marbete)}
+                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl font-mono text-[10px] font-black border transition-all
+                          ${copiado === i.marbete 
+                            ? "bg-emerald-600 border-emerald-600 text-white shadow-md shadow-emerald-100" 
+                            : "bg-slate-50 border-slate-100 text-slate-400 hover:border-emerald-400 hover:text-emerald-600 group-hover:bg-white"}`}
+                      >
+                        {i.marbete}
+                        {copiado === i.marbete ? <CheckCircle size={14} /> : <Copy size={12} className="opacity-30" />}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr><td colSpan="5" className="py-24 text-center text-slate-300 font-black uppercase tracking-[0.3em] text-[10px]">Sin coincidencias encontradas</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* 📟 PANEL DE PAGINACIÓN VERDE CLARO */}
+        <div className="px-8 py-5 bg-emerald-50 border-t border-emerald-100 flex justify-between items-center">
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="p-2 rounded-lg bg-white border border-gray-200 text-gray-400 hover:text-emerald-600 disabled:opacity-20 transition-all shadow-sm"
+            className="w-12 h-10 flex items-center justify-center bg-white border border-emerald-200 rounded-xl text-emerald-600 hover:bg-emerald-600 hover:text-white disabled:opacity-30 transition-all active:scale-90 shadow-sm"
           >
-            <ArrowRight size={18} className="rotate-180" />
+            <ArrowRight size={20} className="rotate-180" strokeWidth={3} />
           </button>
-          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest italic">
-            Página <span className="text-emerald-600 font-black text-sm">{page}</span> de {totalPages}
-          </span>
+          
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span className="text-[10px] font-black text-emerald-700 uppercase tracking-[0.2em] italic">
+              Página <span className="text-emerald-900 mx-1">{page}</span> de {totalPages}
+            </span>
+          </div>
+
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="p-2 rounded-lg bg-white border border-gray-200 text-gray-400 hover:text-emerald-600 disabled:opacity-20 transition-all shadow-sm"
+            className="w-12 h-10 flex items-center justify-center bg-white border border-emerald-200 rounded-xl text-emerald-600 hover:bg-emerald-600 hover:text-white disabled:opacity-30 transition-all active:scale-90 shadow-sm"
           >
-            <ArrowRight size={18} />
+            <ArrowRight size={20} strokeWidth={3} />
           </button>
         </div>
       </div>
 
+      {/* MODAL */}
       {activoSeleccionado && (
         <ActivoModal
           activo={activoSeleccionado}
@@ -256,13 +267,15 @@ export default function DashboardHome() {
 
 function KPI({ icon, label, value }) {
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex items-center gap-5 group hover:border-emerald-200 transition-all">
-      <div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl group-hover:scale-110 transition-transform duration-300">
+    <div className="bg-white border border-slate-100 rounded-[2rem] p-8 shadow-sm flex items-center gap-6 group hover:border-emerald-200 transition-all cursor-default">
+      <div className="p-5 bg-emerald-50 text-emerald-600 rounded-[1.5rem] group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 shadow-sm shadow-emerald-50">
         {icon}
       </div>
       <div className="flex flex-col">
-        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1.5">{label}</span>
-        <span className="text-3xl font-black text-gray-800 tracking-tighter leading-none italic">{value.toLocaleString()}</span>
+        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2 italic">{label}</span>
+        <span className="text-4xl font-black text-slate-800 tracking-tighter leading-none italic uppercase tabular-nums">
+          {value.toLocaleString()}
+        </span>
       </div>
     </div>
   );
