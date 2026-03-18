@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { User, MapPin, Search, Info, ShieldCheck, AlertCircle, Loader2, X } from "lucide-react";
+import { 
+  User, Search, Info, ShieldCheck, AlertCircle, Loader2, 
+  Package, DollarSign, FileText, ChevronRight, Tag 
+} from "lucide-react";
+import ActivoModal from "../components/ActivoModal";
+
 export default function MisEncargos() {
   const [activos, setActivos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState("");
-  const [usuario, setUsuario] = useState({ id: null, nombre: "Victor Salcido", rol: "Docente" });
-  const [seleccionado, setSeleccionado] = useState(null); // Para el modal de detalles
+  const [usuario, setUsuario] = useState({ id: null, nombre: "Cargando...", rol: "Docente" });
+  const [activoParaDetalle, setActivoParaDetalle] = useState(null);
+
+  const API_URL = "https://corporacionperris.com/backend/api/encargos.php";
 
   useEffect(() => {
     const cargarTodo = async () => {
@@ -29,7 +36,7 @@ export default function MisEncargos() {
 
       if (tempId) {
         try {
-          const resActivos = await fetch(`https://corporacionperris.com/backend/api/encargos.php?id_encargado=${tempId}`);
+          const resActivos = await fetch(`${API_URL}?id_encargado=${tempId}`);
           const data = await resActivos.json();
           if (data.success) setActivos(data.data);
         } catch (err) { console.error(err); }
@@ -39,118 +46,153 @@ export default function MisEncargos() {
     cargarTodo();
   }, []);
 
+  const renderMarbete = (item) => {
+    const ed = item.edificio_clv || "??";
+    const au = item.aula_clv || "??";
+    const gr = item.grupo_clv || "??";
+    const clv = item.clave_activo || "??";
+    return `${ed}-${au}-${gr}-${clv}`;
+  };
+
   const filtrados = activos.filter(a => 
     a.nombre_activo?.toLowerCase().includes(busqueda.toLowerCase()) ||
-    a.clave_activo?.toLowerCase().includes(busqueda.toLowerCase())
+    a.clave_activo?.toLowerCase().includes(busqueda.toLowerCase()) ||
+    renderMarbete(a).toLowerCase().includes(busqueda.toLowerCase())
+  );
+
+  if (loading) return (
+    <div className="flex items-center justify-center h-screen bg-slate-50">
+      <Loader2 className="animate-spin text-emerald-600" size={44} />
+    </div>
   );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-700 relative">
+    <div className="p-7 max-w-7xl mx-auto space-y-7 animate-in fade-in duration-500">
       
-      {/* HEADER */}
-      <div className="bg-[#0f172a] rounded-[3rem] p-10 shadow-2xl flex flex-col md:flex-row justify-between items-center border border-slate-800">
-        <div className="flex items-center gap-6">
-          <div className="w-20 h-20 bg-emerald-600 rounded-[2rem] flex items-center justify-center text-white shadow-lg">
-            <User size={40} />
-          </div>
-          <div>
-            <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter">
-              {usuario.nombre}
-            </h1>
-            <p className="text-emerald-400 font-bold text-xs uppercase tracking-[0.2em]">
-              {usuario.rol} • <span className="text-white">ID: #{usuario.id || "..."}</span>
-            </p>
-          </div>
+      {/* HEADER VERDE CON BUSCADOR INTEGRADO */}
+      <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-[3rem] p-9 text-white shadow-2xl relative overflow-hidden">
+        {/* Decoración de fondo */}
+        <div className="absolute -right-6 -bottom-6 text-white/10 -rotate-12">
+          <ShieldCheck size={200} strokeWidth={1} />
         </div>
-        <div className="text-right">
-          <p className="text-slate-500 font-bold text-[10px] uppercase mb-1 tracking-widest">Activos en resguardo</p>
-          <p className="text-7xl font-black text-emerald-500 italic leading-none">{activos.length}</p>
-        </div>
-      </div>
 
-      {/* BUSCADOR */}
-      <div className="relative max-w-2xl mx-auto">
-        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600" size={20} />
-        <input 
-          type="text" 
-          placeholder="Filtrar por nombre o clave..." 
-          className="w-full pl-16 pr-8 py-5 bg-white rounded-full shadow-xl border-none outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-sm transition-all"
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-        />
+        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-8">
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-[2rem] flex items-center justify-center border border-white/30 shadow-lg">
+              <User size={40} strokeWidth={2.5} />
+            </div>
+            <div className="text-center md:text-left">
+              <h2 className="text-4xl font-black italic uppercase tracking-tighter leading-none mb-3">
+                {usuario.nombre}
+              </h2>
+              <div className="flex flex-wrap justify-center md:justify-start items-center gap-3">
+                <div className="flex items-center gap-2 bg-white/10 px-4 py-1.5 rounded-full border border-white/20">
+                  <Tag size={14} className="text-emerald-300"/>
+                  <span className="text-[10px] font-black uppercase tracking-widest">{usuario.rol}</span>
+                </div>
+                <span className="text-emerald-100/70 font-bold text-xs">ID: #{usuario.id}</span>
+                <span className="bg-emerald-500/40 px-3 py-1 rounded-lg text-[10px] font-black border border-emerald-400/30 italic">
+                  {activos.length} EQUIPOS
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* BARRA DE BÚSQUEDA INTEGRADA EN EL HEADER */}
+          <div className="relative w-full lg:w-96 group">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-emerald-200 group-focus-within:text-white transition-colors" size={20} />
+            <input 
+              type="text" 
+              placeholder="Buscar en mi resguardo..." 
+              className="w-full pl-13 pr-6 py-4 bg-white/10 border border-white/20 rounded-2xl outline-none focus:bg-white/20 focus:border-white/40 transition-all font-bold text-sm placeholder:text-emerald-200/50 text-white"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+            />
+          </div>
+        </div>
       </div>
 
       {/* GRID DE ACTIVOS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {loading ? (
-          <div className="col-span-full py-20 text-center"><Loader2 className="animate-spin mx-auto text-emerald-500" size={48} /></div>
-        ) : filtrados.length > 0 ? (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filtrados.length > 0 ? (
           filtrados.map((act) => (
-            <div key={act.id_encargo} className="bg-white rounded-[3rem] p-8 shadow-xl border border-slate-50 hover:scale-[1.02] transition-all group">
-              <div className="flex justify-between mb-6">
-                <span className="bg-slate-900 text-white text-[9px] font-black px-4 py-2 rounded-xl uppercase italic tracking-widest">{act.clave_activo || "S/N"}</span>
-                <ShieldCheck className="text-emerald-500" size={22} />
-              </div>
-              <h3 className="text-2xl font-black text-slate-800 uppercase italic mb-6 leading-tight group-hover:text-emerald-600 transition-colors">{act.nombre_activo}</h3>
-              
-              <div className="flex items-center gap-2 text-slate-400 font-bold text-[10px] uppercase mb-8">
-                <MapPin size={16} className="text-emerald-500" /> ID: <b className="text-slate-700">{act.id_activo}</b>
+            <div 
+              key={act.id_encargo} 
+              onClick={() => setActivoParaDetalle(act)}
+              className="group bg-white rounded-[2.5rem] p-7 border border-slate-100 shadow-sm hover:border-emerald-500 hover:shadow-xl hover:-translate-y-2 active:scale-95 transition-all duration-300 cursor-pointer relative overflow-hidden flex flex-col justify-between"
+            >
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-5">
+                  <span className="bg-emerald-50 text-emerald-600 text-[9px] font-black px-3 py-1.5 rounded-xl border border-emerald-100 uppercase tracking-wider">
+                    MARBETE: {renderMarbete(act)}
+                  </span>
+                  <div className="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                    <Package size={18} />
+                  </div>
+                </div>
+
+                <h4 className="text-base font-black uppercase italic mb-4 leading-tight text-slate-800 group-hover:text-emerald-700 transition-colors">
+                  {act.nombre_activo}
+                </h4>
+                
+                <div className="grid grid-cols-2 gap-3 pt-5 border-t border-slate-100">
+                  <div className="space-y-1">
+                    <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Valor</p>
+                    <div className="flex items-center gap-1 text-emerald-600 font-black text-xs">
+                      <DollarSign size={12} strokeWidth={3}/> 
+                      {parseFloat(act.importe || 0).toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Folio</p>
+                    <div className="flex items-center gap-1 text-slate-600 font-bold text-[10px] truncate">
+                      <FileText size={12}/> {act.folioVR || 'N/A'}
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <button 
-                onClick={() => setSeleccionado(act)}
-                className="w-full py-4 bg-slate-50 text-slate-900 rounded-2xl font-black text-[9px] uppercase tracking-[0.2em] hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center gap-2"
-              >
-                <Info size={14} /> Ver detalles del activo
-              </button>
+              {/* Marca de agua decorativa en la tarjeta */}
+              <div className="absolute -right-4 -bottom-4 text-slate-50 group-hover:text-emerald-50 transition-colors -rotate-12">
+                <ShieldCheck size={80} strokeWidth={4} />
+              </div>
             </div>
           ))
         ) : (
-          <div className="col-span-full py-24 text-center bg-white rounded-[4rem] border-4 border-dashed border-slate-100">
-            <AlertCircle size={48} className="mx-auto text-slate-200 mb-4" />
-            <p className="text-slate-400 font-black uppercase text-xs tracking-widest">No hay activos asignados</p>
+          <div className="col-span-full py-20 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[3rem] flex flex-col items-center justify-center">
+            <AlertCircle className="text-slate-200 mb-3" size={40} />
+            <p className="text-slate-400 font-black uppercase text-xs tracking-widest">Sin resultados en tu resguardo</p>
           </div>
         )}
       </div>
 
-      {/* MODAL DE INFORMACIÓN (Se abre al dar clic) */}
-      {seleccionado && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[3rem] p-10 max-w-lg w-full shadow-2xl relative animate-in zoom-in duration-300">
-            <button onClick={() => setSeleccionado(null)} className="absolute top-8 right-8 text-slate-400 hover:text-red-500 transition-colors">
-              <X size={30} />
-            </button>
-            
-            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
-              <Info size={32} />
-            </div>
-
-            <h2 className="text-3xl font-black text-slate-900 uppercase italic mb-2">{seleccionado.nombre_activo}</h2>
-            <p className="text-emerald-500 font-black text-xs uppercase tracking-widest mb-8">Información General</p>
-
-            <div className="space-y-4">
-              <div className="bg-slate-50 p-5 rounded-2xl flex justify-between items-center">
-                <span className="text-[10px] font-black text-slate-400 uppercase">Clave de Inventario</span>
-                <span className="text-sm font-black text-slate-800">{seleccionado.clave_activo || "N/A"}</span>
-              </div>
-              <div className="bg-slate-50 p-5 rounded-2xl flex justify-between items-center">
-                <span className="text-[10px] font-black text-slate-400 uppercase">ID del Sistema</span>
-                <span className="text-sm font-black text-slate-800">#{seleccionado.id_activo}</span>
-              </div>
-              <div className="bg-slate-50 p-5 rounded-2xl flex justify-between items-center">
-                <span className="text-[10px] font-black text-slate-400 uppercase">Estado</span>
-                <span className="bg-emerald-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase">Asignado</span>
-              </div>
-            </div>
-
-            <button 
-              onClick={() => setSeleccionado(null)}
-              className="w-full mt-8 py-5 bg-[#0f172a] text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-emerald-600 transition-all"
-            >
-              Cerrar Ventana
-            </button>
-          </div>
-        </div>
+      {/* MODAL PRO */}
+      {activoParaDetalle && (
+        <ActivoModal 
+          activo={{
+            ...activoParaDetalle,
+            nombre: activoParaDetalle.nombre_activo,
+            clave: activoParaDetalle.clave_activo,
+            marbete: renderMarbete(activoParaDetalle),
+            importe: activoParaDetalle.importe,
+            referencia: activoParaDetalle.referencia,
+            fecha_documento: activoParaDetalle.fecha_adquisicion,
+            fecha: activoParaDetalle.fecha_adquisicion,
+            edificio: activoParaDetalle.edificio_clv,
+            aula: activoParaDetalle.aula_clv,
+            grupo: activoParaDetalle.grupo_clv,
+            descripcion: activoParaDetalle.descripcion || "Información técnica resguardada por el usuario.",
+            tipo_documento: activoParaDetalle.tipo_documento || "Asignación Directa",
+            folioVR: activoParaDetalle.folioVR || "N/A",
+            actividad: 1 
+          }}
+          // FORZAMOS MODO LECTURA
+          isReadOnly={true} 
+          editMode={false} 
+          setEditMode={() => {}} // Función vacía para que no haga nada
+          onClose={() => setActivoParaDetalle(null)}
+          onSave={() => {}}
+        />
       )}
     </div>
   );
