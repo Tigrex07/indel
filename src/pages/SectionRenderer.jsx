@@ -15,6 +15,7 @@ import MisEncargos from "../components/MisEncargos.jsx";
 export default function SectionRenderer({
   section,
   role, // Viene de Dashboard.jsx
+  userId,
   username,
   grupoSeleccionado,
   onOpenCategory,
@@ -71,7 +72,7 @@ export default function SectionRenderer({
       return <Transferencias />;
     
     case "solicitar-baja":
-      return <SolicitarBaja />;
+      return <SolicitarBaja userId={userId}/>;
 
     
 case "Mis Encargos":

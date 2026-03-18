@@ -15,7 +15,7 @@ const sections = [
   { key: "Mis Encargos", label: "Mis Encargos", icon: <ClipboardList size={20}/>, roles: ["Administrador", "Soporte", "Docente"] },
 ];
 
-export default function Sidebar({ activeSection, setActiveSection, username, userRole, onLogout }) {
+export default function Sidebar({ activeSection, setActiveSection, username, userRole, onLogout, userId }) {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const getFilteredSections = () => {

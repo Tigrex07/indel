@@ -3,29 +3,60 @@ import Sidebar from "./Sidebar";
 import SectionRenderer from "./SectionRenderer";
 
 export default function Dashboard({ onLogout }) {
+console.log("¡HOLA! Soy el Dashboard y ya cargué");
+
   const [activeSection, setActiveSection] = useState("dashboard");
   const [username, setUsername] = useState("");
   const [role, setRole] = useState(""); // Nuevo estado para el rol
+  const [userId, setUserId] = useState(null);
 
   const [grupoSeleccionado, setGrupoSeleccionado] = useState(null);
   const [edificioSeleccionado, setEdificioSeleccionado] = useState(null);
   const [aulaSeleccionada, setAulaSeleccionada] = useState(null);
 
+
+
+const obtenerIdInterno = async (num) => {
+    console.log("EJECUTANDO obtenerIdInterno CON NUM:", num); // LOG DE CONTROL 2
+    try {
+      const res = await fetch("https://corporacionperris.com/backend/api/idusuario.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ numEmpleado: num })
+      });
+      const data = await res.json();
+      console.log("RESPUESTA DE idusuario.php:", data); // LOG DE CONTROL 3
+      if (data.success) {
+        setUserId(data.id_usuario);
+        localStorage.setItem("user_id_interno", data.id_usuario);
+      }
+    } catch (e) {
+      console.error("ERROR EN FETCH ID:", e);
+    }
+  };
+
   useEffect(() => {
-    fetch("https://corporacionperris.com/backend/api/me.php", {
-      credentials: "include",
-    })
-      .then(r => r.json())
-      .then(j => {
-        if (j.success) {
-          setUsername(j.usuario.nombre);
-          // Guardamos el rol tal cual viene (Administrador, Soporte, etc.)
-          setRole(j.usuario.rol); 
-          localStorage.setItem("sesion_activa", JSON.stringify(j.usuario));
+  fetch("https://corporacionperris.com/backend/api/me.php", {
+    credentials: "include",
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j.success) {
+        setUsername(j.usuario.nombre);
+        setRole(j.usuario.rol);
+        
+        // Si el ID ya viene en la sesión (que ahora sí vendrá), lo guardamos directo
+        if (j.usuario.id) {
+          setUserId(j.usuario.id);
+          localStorage.setItem("user_id_interno", j.usuario.id);
+          console.log("ID cargado directamente desde sesión:", j.usuario.id);
         }
-      })
-      .catch(err => console.error("Error al obtener datos del usuario:", err));
-  }, []);
+      }
+    })
+    .catch(err => console.error("Error:", err));
+}, []);
+
+
 
   return (
     <div className="min-h-screen flex bg-emerald-50 text-gray-900">
@@ -40,6 +71,7 @@ export default function Dashboard({ onLogout }) {
         }}
         username={username}
         userRole={role} // Pasamos el rol al Sidebar
+        userId={userId}
         onLogout={onLogout}
       />
 
@@ -47,6 +79,7 @@ export default function Dashboard({ onLogout }) {
         <SectionRenderer
           section={activeSection}
           role={role} // Pasamos el rol al Renderer para seguridad
+          userId={userId}
           grupoSeleccionado={grupoSeleccionado}
           edificioSeleccionado={edificioSeleccionado}
           setEdificioSeleccionado={(edificio) => {
