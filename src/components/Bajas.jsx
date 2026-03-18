@@ -35,11 +35,11 @@ const SolicitudPdf = ({ solicitud }) => (
   </Document>
 );
 
-export default function GestionSolicitudes() {
+export default function GestionSolicitudes({userId}) {
   const [solicitudes, setSolicitudes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState("");
-  const [filtroEstado, setFiltroEstado] = useState("todos");
+  const [filtroEstado, setFiltroEstado] = useState("pendiente");
   const [solicitudExpandida, setSolicitudExpandida] = useState(null);
   const [verPdf, setVerPdf] = useState(null);
   const [isProcessing, setIsProcessing] = useState(null);
@@ -84,7 +84,7 @@ export default function GestionSolicitudes() {
           id_solicitud: id,
           estado: nuevoEstadoId, 
           observaciones: obsAdmin || (nuevoEstadoId === 3 ? "Aprobado conforme a revisión." : "Rechazado."),
-          id_revisor: 1 
+          id_revisor: userId
         })
       });
       const result = await res.json();
